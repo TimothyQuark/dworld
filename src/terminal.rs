@@ -23,7 +23,8 @@ struct TopSidebarText;
 // A system which initializes everything for the DWorld Window, such as
 // the terminal, the sidebars
 // Note to self: it is basically impossible to see inside starting systems with
-// debugging, all the variables are either optimized away or can't be found
+// VSC debugging, all the variables are either optimized away or can't be found.
+// Also, variables like assets and texture_atlases are duplicated dozens of times...
 pub fn setup_terminal(
     mut commands: Commands,
     assets: Res<AssetServer>,

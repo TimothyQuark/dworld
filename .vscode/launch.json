@@ -5,7 +5,19 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug Rust",
+            "name": "Rust Debug 1",
+            "type": "lldb",
+            "request": "launch",            
+            "cargo": {
+                "args": [
+                    "build"                    
+                ]
+            },
+            "program": "${cargo:program}",
+            "args": []
+        },
+        {
+            "name": "Rust Debug 2",
             "type": "lldb",
             "request": "launch",
             "cargo": {

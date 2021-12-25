@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
-mod map;
-pub use map::*;
+// mod map;
+// pub use map::*;
 
 mod terminal;
 pub use terminal::*;
@@ -20,18 +20,4 @@ fn main() {
         .add_startup_system(setup_terminal.system())
         .add_system(change_sprite_colors.system())
         .run();
-}
-
-fn change_sprite_colors(mut query: Query<&mut TextureAtlasSprite>) {
-    let mut red = false;
-    for mut sprite in &mut query.iter_mut() {
-        // println!("Found a sprite to draw!");
-        red = !red;
-        if red {
-            sprite.color = Color::RED;
-            sprite.index = 4;
-        } else {
-            sprite.color = Color::BLUE;
-        }
-    }
 }

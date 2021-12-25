@@ -7,7 +7,6 @@ pub const TILESIZE: f32 = 20.0;
 pub const SCREEN_WIDTH: f32 = 1080.0;
 pub const SCREEN_HEIGHT: f32 = 720.0;
 
-
 const LEFT_SIDEBAR: f32 = 0.0;
 const RIGHT_SIDEBAR: f32 = 280.0;
 const BOTTOM_SIDEBAR: f32 = 220.0;
@@ -16,13 +15,15 @@ const TOP_SIDEBAR: f32 = 20.0;
 // Components used
 struct TerminalTile;
 
-struct LeftSidebarText;
+// struct LeftSidebarText;
 struct RightSidebarText;
 struct BottomSidebarText;
 struct TopSidebarText;
 
 // A system which initializes everything for the DWorld Window, such as
 // the terminal, the sidebars
+// Note to self: it is basically impossible to see inside starting systems with
+// debugging, all the variables are either optimized away or can't be found
 pub fn setup_terminal(
     mut commands: Commands,
     assets: Res<AssetServer>,
@@ -111,7 +112,6 @@ pub fn setup_terminal(
     commands
         .spawn_bundle(Text2dBundle {
             text: Text {
-                
                 sections: vec![
                     TextSection {
                         value: "This is a line in the log\n".to_string(),
@@ -139,14 +139,13 @@ pub fn setup_terminal(
     commands
         .spawn_bundle(Text2dBundle {
             text: Text {
-                
                 sections: vec![
                     TextSection {
                         value: "This is a line on the right side\n".to_string(),
                         style: text_style.clone(),
                     };
                     // Number of sections should be as many lines as in the log
-                    (RIGHT_SIDEBAR / TILESIZE) as usize
+                    ((SCREEN_HEIGHT - BOTTOM_SIDEBAR - TILESIZE) / TILESIZE) as usize
                 ],
                 alignment: TextAlignment {
                     vertical: VerticalAlign::Bottom,
@@ -154,11 +153,30 @@ pub fn setup_terminal(
                 },
             },
             transform: Transform {
-                translation: Vec3::new((half_x as f32 - RIGHT_SIDEBAR), (-half_y as f32) + BOTTOM_SIDEBAR, 0.0),
+                // Start one line below the top sidebar so they do not overlap
+                translation: Vec3::new(
+                    half_x as f32 - RIGHT_SIDEBAR,
+                    half_y as f32 - TILESIZE,
+                    0.0,
+                ),
                 scale: Vec3::ONE,
                 ..Default::default()
             },
             ..Default::default()
         })
         .insert(RightSidebarText);
+}
+
+pub fn change_sprite_colors(mut query: Query<&mut TextureAtlasSprite>) {
+    let mut red = false;
+    for mut sprite in &mut query.iter_mut() {
+        // println!("Found a sprite to draw!");
+        red = !red;
+        if red {
+            sprite.color = Color::RED;
+            sprite.index = 4;
+        } else {
+            sprite.color = Color::BLUE;
+        }
+    }
 }

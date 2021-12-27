@@ -7,7 +7,7 @@ pub const TILESIZE: f32 = 20.0;
 pub const SCREEN_WIDTH: f32 = 1080.0;
 pub const SCREEN_HEIGHT: f32 = 720.0;
 
-const LEFT_SIDEBAR: f32 = 0.0;
+// const LEFT_SIDEBAR: f32 = 0.0;
 const RIGHT_SIDEBAR: f32 = 280.0;
 const BOTTOM_SIDEBAR: f32 = 220.0;
 const TOP_SIDEBAR: f32 = 20.0;
@@ -43,22 +43,24 @@ pub fn setup_terminal(
     let font = assets.load("square.ttf");
     let text_style = TextStyle {
         font,
-        font_size: 20.0,
+        // Font size is not in pixels, or there is padding between sections. Hence, smaller than TILESIZE, this was fitted manually
+        font_size: 18.1,
         color: Color::WHITE,
     };
 
     // Using square tiles for now, but might not always be the case
+    // Use this instead of TILESIZE
     let tile_size = Vec2::splat(TILESIZE);
 
     // Bevy has (0,0) coordinate in middle of the window, not in some corner. This is that offset
+    // REMEMBER that this makes a lot of calculations fairly complicated, hence we have stuff like tile_size / 2.0 etc to shift everything up
     let half_x = (SCREEN_WIDTH / 2.0) as i32;
     let half_y = (SCREEN_HEIGHT / 2.0) as i32;
 
-    let y_iterator = (-half_y + (tile_size[1] / 2.0 + BOTTOM_SIDEBAR) as i32
+    let y_iterator = (-half_y + (BOTTOM_SIDEBAR + tile_size[1] / 2.0) as i32
         ..half_y - TOP_SIDEBAR as i32)
         .step_by(tile_size[1] as usize);
-    let x_iterator = (-half_x + (tile_size[0] / 2.0 + LEFT_SIDEBAR) as i32
-        ..half_x - RIGHT_SIDEBAR as i32)
+    let x_iterator = (-half_x + (tile_size[0] / 2.0) as i32..half_x - RIGHT_SIDEBAR as i32)
         .step_by(tile_size[0] as usize);
 
     // Create entities, all with a SpriteSheetBundle and TerminalTile components. These entities
@@ -72,6 +74,7 @@ pub fn setup_terminal(
             commands
                 .spawn_bundle(SpriteSheetBundle {
                     transform: Transform {
+                        // Translation is middle of sprite, hence iterator uses stuff like tile_size / 2.0 etc
                         translation: Vec3::new(x as f32, y as f32, 0.0),
                         scale: Vec3::splat(1.0),
                         ..Default::default()
@@ -89,6 +92,8 @@ pub fn setup_terminal(
     }
 
     // Spawn text for top sidebar
+    // TODO: Maybe using TextBundle might be better, because it allows for limiting size of the text box, also set padding.
+    // See https://github.com/bevyengine/bevy/blob/latest/examples/ui/text_debug.rs for example
     commands
         .spawn_bundle(Text2dBundle {
             text: Text::with_section(
@@ -100,7 +105,8 @@ pub fn setup_terminal(
                 },
             ),
             transform: Transform {
-                translation: Vec3::new(-half_x as f32, half_y as f32 - (TILESIZE / 2.0), 0.0),
+                // For text, this translation sets the x as the leftmost limit, and y is the center of the first line.
+                translation: Vec3::new(-half_x as f32, half_y as f32 - (tile_size[1] / 2.0), 0.0),
                 scale: Vec3::ONE,
                 ..Default::default()
             },
@@ -157,7 +163,7 @@ pub fn setup_terminal(
                 // Start one line below the top sidebar so they do not overlap
                 translation: Vec3::new(
                     half_x as f32 - RIGHT_SIDEBAR,
-                    half_y as f32 - TILESIZE,
+                    half_y as f32 - TOP_SIDEBAR,
                     0.0,
                 ),
                 scale: Vec3::ONE,

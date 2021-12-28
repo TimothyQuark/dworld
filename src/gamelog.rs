@@ -10,7 +10,7 @@ pub struct GameLog {
 // Take the entries in the game log resource, and display them on the bottom
 // sidebar
 pub fn draw_gamelog_system(
-    log_resource: Res<GameLog>,                           // 3
+    log_resource: Res<GameLog>,                       // 3
     mut query: Query<&mut Text, With<BottomSidebar>>, // 11
 ) {
     let mut sidebar = query.iter_mut().next().unwrap();

@@ -22,7 +22,6 @@ struct RightSidebar;
 pub struct BottomSidebar;
 struct TopSidebar;
 
-
 /*
 Note to self: it is basically impossible to see inside starting systems with
 VSC debugging, all the variables are either optimized away or can't be found.
@@ -63,7 +62,8 @@ pub fn setup_terminal(
     let half_x = (SCREEN_WIDTH / 2.0) as i32;
     let half_y = (SCREEN_HEIGHT / 2.0) as i32;
 
-    let y_iterator = (-half_y + (BOTTOM_SIDEBAR + tile_size[1] / 2.0) as i32..half_y - TOP_SIDEBAR as i32)
+    let y_iterator = (-half_y + (BOTTOM_SIDEBAR + tile_size[1] / 2.0) as i32
+        ..half_y - TOP_SIDEBAR as i32)
         .step_by(tile_size[1] as usize);
     let x_iterator = (-half_x + (tile_size[0] / 2.0) as i32..half_x - RIGHT_SIDEBAR as i32)
         .step_by(tile_size[0] as usize);

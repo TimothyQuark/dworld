@@ -20,7 +20,7 @@ fn main() {
             vsync: false,
             ..Default::default()
         })
-        .insert_resource(ClearColor(Color::BLACK))        
+        .insert_resource(ClearColor(Color::BLACK))
         .add_plugins(DefaultPlugins)
         .add_startup_system(setup.system())
         .add_startup_system(setup_terminal.system())
@@ -31,8 +31,7 @@ fn main() {
 }
 
 fn setup(mut commands: Commands) {
-// Spawn camera and UI Camera bundles
-commands.spawn_bundle(OrthographicCameraBundle::new_2d());
-commands.spawn_bundle(UiCameraBundle::default());
-
+    // Spawn camera and UI Camera bundles
+    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
+    commands.spawn_bundle(UiCameraBundle::default());
 }

@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use super::text::*;
+
 // Systems that deal with the terminal/game window itself.
 
 // Sizes of various important areas of the terminal.
@@ -35,16 +37,18 @@ with it, such as the sidebar text.
 pub fn setup_terminal(
     mut commands: Commands,
     assets: Res<AssetServer>,
-    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+    mut texture_atlases: ResMut<Assets<TextureAtlas>>
+    
 ) {
-    println!("Setting up the terminal");
+    println!("Setup terminal");
 
     // Load sprite sheet into a texture atlas
     let texture_handle: Handle<Texture> = assets.load("cp437_20x20_transparent.png");
     let texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(20.0, 20.0), 16, 16);
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
-    // Load font
+    // Load font. Cannot use DefaultFont because resources cannot be accessed
+    // by startup systems
     let font = assets.load("square.ttf");
     let text_style = TextStyle {
         font,

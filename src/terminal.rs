@@ -17,7 +17,7 @@ struct TerminalTile;
 
 // struct LeftSidebarText;
 struct RightSidebarText;
-struct BottomSidebarText;
+pub struct BottomSidebarText;
 struct TopSidebarText;
 
 // A system which initializes everything for the DWorld Window, such as
@@ -30,6 +30,8 @@ pub fn setup_terminal(
     assets: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
+    println!("Setting up the terminal");
+
     // Spawn camera and UI Camera bundles
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
     commands.spawn_bundle(UiCameraBundle::default());
@@ -93,6 +95,7 @@ pub fn setup_terminal(
 
     // Spawn text for top sidebar
     // TODO: Maybe using TextBundle might be better, because it allows for limiting size of the text box, also set padding.
+    // Can use a Rect to set the area the textbox fills.
     // See https://github.com/bevyengine/bevy/blob/latest/examples/ui/text_debug.rs for example
     commands
         .spawn_bundle(Text2dBundle {
@@ -121,7 +124,7 @@ pub fn setup_terminal(
             text: Text {
                 sections: vec![
                     TextSection {
-                        value: "This is a line in the log\n".to_string(),
+                        value: "This is not a line from the log itself, should not appear\n".to_string(),
                         style: text_style.clone(),
                     };
                     // Number of sections should be as many lines as in the log

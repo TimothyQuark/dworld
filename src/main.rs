@@ -6,6 +6,9 @@ use bevy::prelude::*;
 mod terminal;
 pub use terminal::*;
 
+mod gamelog;
+pub use gamelog::*;
+
 fn main() {
     App::build()
         .insert_resource(WindowDescriptor {
@@ -18,6 +21,8 @@ fn main() {
         .insert_resource(ClearColor(Color::BLACK))
         .add_plugins(DefaultPlugins)
         .add_startup_system(setup_terminal.system())
-        .add_system(change_sprite_colors.system())
+        .add_startup_system(init_gamelog_system.system())
+        // .add_system(change_sprite_colors.system())
+        .add_system(draw_gamelog_system.system())
         .run();
 }

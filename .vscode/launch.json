@@ -33,6 +33,26 @@
             "sourceLanguages": [
                 "rust"
             ]
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug Bevy",
+            "cargo": {
+                "args": [
+                    "build",
+                    
+                ],
+                "filter": {
+                    "name": "dworld",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "CARGO_MANIFEST_DIR": "${workspaceFolder}",
+            }
         }
     ]
 }

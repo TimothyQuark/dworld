@@ -1,40 +1,44 @@
 use bevy::prelude::*;
 
+// Systems that deal with the terminal/game window itself.
+
 // Sizes of various important areas of the terminal.
 // All these numbers are in pixels.
-// Note that all numbers should be divisible by TILESIZE
+// Note that numbers should be divisible by TILESIZE
 pub const TILESIZE: f32 = 20.0;
 pub const SCREEN_WIDTH: f32 = 1080.0;
 pub const SCREEN_HEIGHT: f32 = 720.0;
-
 // const LEFT_SIDEBAR: f32 = 0.0;
 const RIGHT_SIDEBAR: f32 = 280.0;
 const BOTTOM_SIDEBAR: f32 = 220.0;
 const TOP_SIDEBAR: f32 = 20.0;
 
-// Components used
+// Components
+
+/// Identifies the entities used for drawing the game terminal
 struct TerminalTile;
-
 // struct LeftSidebarText;
-struct RightSidebarText;
-pub struct BottomSidebarText;
-struct TopSidebarText;
+struct RightSidebar;
+pub struct BottomSidebar;
+struct TopSidebar;
 
-// A system which initializes everything for the DWorld Window, such as
-// the terminal, the sidebars
-// Note to self: it is basically impossible to see inside starting systems with
-// VSC debugging, all the variables are either optimized away or can't be found.
-// Also, variables like assets and texture_atlases are duplicated dozens of times...
+
+/*
+Note to self: it is basically impossible to see inside starting systems with
+VSC debugging, all the variables are either optimized away or can't be found.
+Also, variables like assets and texture_atlases are duplicated dozens of times...
+*/
+
+/**
+System which initializes the game window, and creates the various entities associated
+with it, such as the sidebar text.
+*/
 pub fn setup_terminal(
     mut commands: Commands,
     assets: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
     println!("Setting up the terminal");
-
-    // Spawn camera and UI Camera bundles
-    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
-    commands.spawn_bundle(UiCameraBundle::default());
 
     // Load sprite sheet into a texture atlas
     let texture_handle: Handle<Texture> = assets.load("cp437_20x20_transparent.png");
@@ -59,8 +63,7 @@ pub fn setup_terminal(
     let half_x = (SCREEN_WIDTH / 2.0) as i32;
     let half_y = (SCREEN_HEIGHT / 2.0) as i32;
 
-    let y_iterator = (-half_y + (BOTTOM_SIDEBAR + tile_size[1] / 2.0) as i32
-        ..half_y - TOP_SIDEBAR as i32)
+    let y_iterator = (-half_y + (BOTTOM_SIDEBAR + tile_size[1] / 2.0) as i32..half_y - TOP_SIDEBAR as i32)
         .step_by(tile_size[1] as usize);
     let x_iterator = (-half_x + (tile_size[0] / 2.0) as i32..half_x - RIGHT_SIDEBAR as i32)
         .step_by(tile_size[0] as usize);
@@ -72,7 +75,7 @@ pub fn setup_terminal(
     // color and index
     for y in y_iterator {
         for x in x_iterator.clone() {
-            // SpriteSheetBundle is a bundle itself, hence can't just use a tuple for spawn_bundle function
+            // SpriteSheetBundle is a bundle of components, not a component itself.
             commands
                 .spawn_bundle(SpriteSheetBundle {
                     transform: Transform {
@@ -115,7 +118,7 @@ pub fn setup_terminal(
             },
             ..Default::default()
         })
-        .insert(TopSidebarText);
+        .insert(TopSidebar);
 
     // Spawn text for bottom sidebar. Sections added so that you can accesss
     // them later (also don't want to add more sections during the game itself)
@@ -142,7 +145,7 @@ pub fn setup_terminal(
             },
             ..Default::default()
         })
-        .insert(BottomSidebarText);
+        .insert(BottomSidebar);
 
     // Spawn text for right sidebar. Sections added so that you can accesss
     // them later (also don't want to add more sections during the game itself)
@@ -174,19 +177,19 @@ pub fn setup_terminal(
             },
             ..Default::default()
         })
-        .insert(RightSidebarText);
+        .insert(RightSidebar);
 }
 
-pub fn change_sprite_colors(mut query: Query<&mut TextureAtlasSprite>) {
-    let mut red = false;
-    for mut sprite in &mut query.iter_mut() {
-        // println!("Found a sprite to draw!");
-        red = !red;
-        if red {
-            sprite.color = Color::RED;
-            sprite.index = 4;
-        } else {
-            sprite.color = Color::BLUE;
-        }
-    }
-}
+// pub fn change_sprite_colors(mut query: Query<&mut TextureAtlasSprite>) {
+//     let mut red = false;
+//     for mut sprite in &mut query.iter_mut() {
+//         // println!("Found a sprite to draw!");
+//         red = !red;
+//         if red {
+//             sprite.color = Color::RED;
+//             sprite.index = 4;
+//         } else {
+//             sprite.color = Color::BLUE;
+//         }
+//     }
+// }

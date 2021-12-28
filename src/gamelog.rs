@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use std::cmp::min;
 
-use super::BottomSidebarText;
+use super::BottomSidebar;
 
 pub struct GameLog {
     pub entries: Vec<TextSection>,
@@ -11,7 +11,7 @@ pub struct GameLog {
 // sidebar
 pub fn draw_gamelog_system(
     log_resource: Res<GameLog>,                           // 3
-    mut query: Query<&mut Text, With<BottomSidebarText>>, // 11
+    mut query: Query<&mut Text, With<BottomSidebar>>, // 11
 ) {
     let mut sidebar = query.iter_mut().next().unwrap();
     let idx = min(sidebar.sections.len(), log_resource.entries.len());

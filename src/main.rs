@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
-// mod map;
-// pub use map::*;
+mod map;
+pub use map::*;
 
 mod terminal;
 pub use terminal::*;
@@ -30,6 +30,7 @@ fn main() {
         .add_startup_system(init_gamelog_system.system().after("setup"))
         // .add_system(change_sprite_colors.system())
         .add_system(draw_gamelog_system.system())
+        .add_system(draw_map.system())
         .run();
 }
 
@@ -49,8 +50,9 @@ fn setup(mut commands: Commands, assets: Res<AssetServer>) {
         font_size: 18.1,
         color: Color::WHITE,
     };
-    commands.insert_resource(DefaultFont(font_handle));    
+    commands.insert_resource(DefaultFont(font_handle));
     commands.insert_resource(DefaultTextStyle(text_style));
+
+    // Add the map
+    commands.insert_resource(Map::new());
 }
-
-

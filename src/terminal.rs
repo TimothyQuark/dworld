@@ -1,6 +1,6 @@
-use bevy::prelude::*;
+use std::iter::StepBy;
 
-use super::text::*;
+use bevy::prelude::*;
 
 // Systems that deal with the terminal/game window itself.
 
@@ -18,7 +18,7 @@ const TOP_SIDEBAR: f32 = 20.0;
 // Components
 
 /// Identifies the entities used for drawing the game terminal
-struct TerminalTile;
+pub struct TerminalTile;
 // struct LeftSidebarText;
 struct RightSidebar;
 pub struct BottomSidebar;
@@ -30,6 +30,23 @@ VSC debugging, all the variables are either optimized away or can't be found.
 Also, variables like assets and texture_atlases are duplicated dozens of times...
 */
 
+/// Calculates translation of TerminalTiles.
+/// (x_iterator, y_iterator)
+pub fn screentiles_iterator() -> (StepBy<std::ops::Range<i32>>, StepBy<std::ops::Range<i32>>) {
+    let tile_size = Vec2::splat(TILESIZE);
+
+    let half_x = (SCREEN_WIDTH / 2.0) as i32;
+    let half_y = (SCREEN_HEIGHT / 2.0) as i32;
+
+    let y_iterator = (-half_y + (BOTTOM_SIDEBAR + tile_size[1] / 2.0) as i32
+        ..half_y - TOP_SIDEBAR as i32)
+        .step_by(tile_size[1] as usize);
+    let x_iterator = (-half_x + (tile_size[0] / 2.0) as i32..half_x - RIGHT_SIDEBAR as i32)
+        .step_by(tile_size[0] as usize);
+
+    (x_iterator, y_iterator)
+}
+
 /**
 System which initializes the game window, and creates the various entities associated
 with it, such as the sidebar text.
@@ -37,8 +54,7 @@ with it, such as the sidebar text.
 pub fn setup_terminal(
     mut commands: Commands,
     assets: Res<AssetServer>,
-    mut texture_atlases: ResMut<Assets<TextureAtlas>>
-    
+    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
     println!("Setup terminal");
 
@@ -66,17 +82,15 @@ pub fn setup_terminal(
     let half_x = (SCREEN_WIDTH / 2.0) as i32;
     let half_y = (SCREEN_HEIGHT / 2.0) as i32;
 
-    let y_iterator = (-half_y + (BOTTOM_SIDEBAR + tile_size[1] / 2.0) as i32
-        ..half_y - TOP_SIDEBAR as i32)
-        .step_by(tile_size[1] as usize);
-    let x_iterator = (-half_x + (tile_size[0] / 2.0) as i32..half_x - RIGHT_SIDEBAR as i32)
-        .step_by(tile_size[0] as usize);
+    let (x_iterator, y_iterator) = screentiles_iterator();
 
-    // Create entities, all with a SpriteSheetBundle and TerminalTile components. These entities
-    // are the inidividual tiles you see on the terminal. Defaulted to hearts, so you can
-    // tell if it didn't load correctly.
-    // The translation (position) of these entities should never change, only
-    // color and index
+    /*
+    Create entities, all with a SpriteSheetBundle and TerminalTile components. These entities
+    are the inidividual tiles you see on the terminal. Defaulted to hearts, so you can
+    tell if it didn't load correctly.
+    The translation (position) of these entities should never change, only
+    color and index
+    */
     for y in y_iterator {
         for x in x_iterator.clone() {
             // SpriteSheetBundle is a bundle of components, not a component itself.

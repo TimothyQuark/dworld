@@ -16,16 +16,19 @@ pub enum TileType {
 }
 
 pub struct Map {
+    /// (0,0) is the bottom left most tile
     pub tiles: Vec<TileType>,
     pub width: usize,
     pub height: usize,
 }
 
 impl Map {
+    /// Converts XY coordinate to index in tile vec
     pub fn xy_idx(&self, x: usize, y: usize) -> usize {
         (y as usize * self.width as usize) + x as usize
     }
 
+    /// Converts index in tile vec to XY coordinate
     pub fn idx_xy(&self, idx: usize) -> (usize, usize) {
         let x: usize = idx % self.width;
         let y = (idx - x) / self.height;
@@ -39,6 +42,10 @@ impl Map {
             width: MAPWIDTH,
             height: MAPHEIGHT,
         };
+
+        // Used for testing
+        // map.tiles[0] = TileType::Floor;
+        // map.tiles[3] = TileType::Floor;
 
         map
     }
@@ -66,33 +73,19 @@ pub fn draw_map(
             transform.translation.x = terminal_x as f32;
             transform.translation.y = terminal_y as f32;
 
-            // TODO: Add function which converts ASCII to a sprite index
-            let (map_x, map_y) = map.idx_xy(idx);
-            sprite.index = 10;
-
+            // Convert map Ttile to an index in the textureatlas
+            // let (map_x, map_y) = map.idx_xy(idx);
+            sprite.index = tiletype_to_spriteindex(map.tiles[idx]);
             idx += 1;
         }
     }
+}
 
-    // for (mut transform, mut atlas) in query.iter_mut() {
-
-    //     // These iterators should have exactly as many items as this query, panic if not true
-    //     let x = x_iterator.next().unwrap();
-    //     let y = y_iterator.next().unwrap();
-
-    //     // transform.translation.x = x as f32 * TILESIZE;
-    //     // transform.translation.y = y as f32 * TILESIZE;
-
-    //     // let x = transform.translation.x
-
-    //     // let (x,y) = map.idx_xy(idx);
-
-    //     // // println!("x: {}, y: {}", x, y);
-    //     // transform.translation.x = x as f32 * TILESIZE;
-    //     // transform.translation.y = y as f32 * TILESIZE;
-
-    //     // atlas.index = 10;
-
-    //     idx += 1;
-    // }
+fn tiletype_to_spriteindex(tile: TileType) -> u32 {
+    match tile {
+        TileType::Wall => 35,
+        TileType::Floor => 46,
+        TileType::DownStairs => 1,
+        TileType::UpStairs => 1,
+    }
 }

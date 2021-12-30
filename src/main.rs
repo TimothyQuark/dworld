@@ -1,3 +1,4 @@
+use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
 
 mod map;
@@ -12,6 +13,9 @@ pub use gamelog::*;
 mod text;
 pub use text::*;
 
+mod utilities;
+pub use utilities::*;
+
 fn main() {
     App::build()
         // Window Descriptor needs to exist when the game is build, hence
@@ -25,9 +29,13 @@ fn main() {
         })
         .insert_resource(ClearColor(Color::BLACK))
         .add_plugins(DefaultPlugins)
+        // .add_plugin(LogDiagnosticsPlugin::default())
+        .add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_startup_system(setup.system().label("setup"))
         .add_startup_system(setup_terminal.system().after("setup"))
         .add_startup_system(init_gamelog_system.system().after("setup"))
+        .add_system(bevy::input::system::exit_on_esc_system.system())
+        // .add_system(print_resources.system())
         // .add_system(change_sprite_colors.system())
         .add_system(draw_gamelog_system.system())
         .add_system(draw_map.system())

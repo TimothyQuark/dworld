@@ -2,6 +2,7 @@ use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
 
 mod map;
+use bevy::window::WindowMode;
 pub use map::*;
 
 mod terminal;
@@ -24,7 +25,9 @@ fn main() {
             title: "DWorld".to_string(),
             width: SCREEN_WIDTH,
             height: SCREEN_HEIGHT,
-            vsync: false,
+            vsync: true,
+            resizable: false,
+            mode : WindowMode::Windowed,
             ..Default::default()
         })
         .insert_resource(ClearColor(Color::BLACK))

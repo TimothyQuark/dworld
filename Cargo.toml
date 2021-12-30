@@ -20,7 +20,8 @@ features = [
   "bevy_gltf",
   "png",
   "hdr",
-  "x11"
+  "x11",
+  "wayland"
 ]
 
 # [dependencies.bevy_kira_audio]

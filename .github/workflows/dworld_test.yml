@@ -24,9 +24,16 @@ jobs:
           - os: windows-latest
             artifact_name: dworld.exe
             asset_name: dworld-windows.exe
-          - os: macos-latest
-            artifact_name: dworld_rust
-            asset_name: dworld-macos
+          # There seems to be a bug with MacOS compiling, not sure why
+          # I am getting it. 
+          # https://github.com/SergioBenitez/Rocket/issues/1321
+          # https://github.com/rust-lang/cargo/issues/9218
+          # TODO: This might be fixed by running nightly toolchain instead of
+          # stable for MacOS, see https://github.com/bevyengine/bevy/blob/main/.github/workflows/ci.yml
+          # for possible way to implement
+          # - os: macos-latest
+          #   artifact_name: dworld_rust
+          #   asset_name: dworld-macos
 
     steps:
     - uses: actions/checkout@v2

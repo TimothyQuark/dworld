@@ -2,6 +2,8 @@ use std::iter::StepBy;
 
 use bevy::prelude::*;
 
+use super::default_textstyle;
+
 // Systems that deal with the terminal/game window itself.
 
 // Sizes of various important areas of the terminal.
@@ -17,7 +19,7 @@ const TOP_SIDEBAR: f32 = 20.0;
 
 // Components
 
-/// Identifies the entities used for drawing the game terminal
+/// Identifies entities used for drawing the game terminal (i.e. the map)
 pub struct TerminalTile;
 // struct LeftSidebarText;
 struct RightSidebar;
@@ -56,7 +58,7 @@ pub fn setup_terminal(
     assets: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
-    println!("Setup terminal");
+    println!("Setting up the terminal");
 
     // Load sprite sheet into a texture atlas
     let texture_handle: Handle<Texture> = assets.load("cp437_20x20_transparent.png");
@@ -65,13 +67,7 @@ pub fn setup_terminal(
 
     // Load font. Cannot use DefaultFont because resources cannot be accessed
     // by startup systems
-    let font = assets.load("square.ttf");
-    let text_style = TextStyle {
-        font,
-        // Font size is not in pixels, or there is padding between sections. Hence, smaller than TILESIZE, this was fitted manually
-        font_size: 18.1,
-        color: Color::WHITE,
-    };
+    let text_style = default_textstyle(assets);
 
     // Using square tiles for now, but might not always be the case
     // Use this instead of TILESIZE
@@ -145,7 +141,7 @@ pub fn setup_terminal(
             text: Text {
                 sections: vec![
                     TextSection {
-                        value: "This is not a line from the log itself, should not appear\n".to_string(),
+                        value: "-------------------------------------\n".to_string(),
                         style: text_style.clone(),
                     };
                     // Number of sections should be as many lines as in the log

@@ -2,6 +2,8 @@ use bevy::ecs::archetype::Archetypes;
 use bevy::ecs::component::Components;
 use bevy::reflect::TypeRegistration;
 
+/// System which prints all resources in the World to the console.
+/// Useful for debugging
 pub fn print_resources(archetypes: &Archetypes, components: &Components) {
     let mut r: Vec<String> = archetypes
         .resource()

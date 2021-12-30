@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use std::cmp::min;
 
-use super::BottomSidebar;
+use super::{default_textstyle, BottomSidebar};
 
 /// Component which holds the text of the game log.
 pub struct GameLog {
@@ -15,7 +15,6 @@ pub fn draw_gamelog_system(
     mut query: Query<&mut Text, With<BottomSidebar>>,
 ) {
     // There should only be one bottom sidebar component in the World
-    // let mut sidebar = query.iter_mut().next().unwrap();
     let mut sidebar = query
         .single_mut()
         .expect("There should only be one bottom sidebar");
@@ -37,13 +36,7 @@ pub fn init_gamelog_system(mut commands: Commands, assets: Res<AssetServer>) {
 
     // Cannot use DefaultTextStyle because resources not available to
     // startup systems
-    let font = assets.load("square.ttf");
-    let text_style = TextStyle {
-        font,
-        // Font size is not in pixels, or there is padding between sections. Hence, smaller than TILESIZE, this was fitted manually
-        font_size: 18.1,
-        color: Color::WHITE,
-    };
+    let text_style = default_textstyle(assets);
 
     commands.insert_resource(GameLog {
         entries: vec![

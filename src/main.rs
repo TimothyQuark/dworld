@@ -27,7 +27,7 @@ fn main() {
             height: SCREEN_HEIGHT,
             vsync: true,
             resizable: false,
-            mode : WindowMode::Windowed,
+            mode: WindowMode::Windowed,
             ..Default::default()
         })
         .insert_resource(ClearColor(Color::BLACK))
@@ -54,16 +54,10 @@ fn setup(mut commands: Commands, assets: Res<AssetServer>) {
 
     // Load the default font and text style. Note that resources are not accessible to
     // startup systems.
-    let font_handle = assets.load("square.ttf");
-    let text_style = TextStyle {
-        font: font_handle.clone(),
-        // Font size is not in pixels, or there is padding between sections. Hence, smaller than TILESIZE, this was fitted manually
-        font_size: 18.1,
-        color: Color::WHITE,
-    };
-    commands.insert_resource(DefaultFont(font_handle));
-    commands.insert_resource(DefaultTextStyle(text_style));
+    let default_text_style = default_textstyle(assets);
+    // commands.insert_resource(DefaultFont(font_handle));
+    commands.insert_resource(DefaultTextStyle(default_text_style));
 
     // Add the map
-    commands.insert_resource(Map::new());
+    commands.insert_resource(Map::new(SCREEN_WIDTH as u32, SCREEN_HEIGHT as u32));
 }

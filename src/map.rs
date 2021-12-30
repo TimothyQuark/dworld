@@ -1,11 +1,11 @@
 use bevy::prelude::*;
 
-use super::{screentiles_iterator, TerminalTile, SCREEN_HEIGHT, SCREEN_WIDTH, TILESIZE};
+use super::{screentiles_iterator, TerminalTile};
 
 // Map width and height, in number of tiles
-pub const MAPWIDTH: usize = (SCREEN_WIDTH / TILESIZE) as usize;
-pub const MAPHEIGHT: usize = (SCREEN_HEIGHT / TILESIZE) as usize;
-pub const MAPCOUNT: usize = MAPHEIGHT * MAPWIDTH;
+// pub const MAPWIDTH: usize = (SCREEN_WIDTH / TILESIZE) as usize;
+// pub const MAPHEIGHT: usize = (SCREEN_HEIGHT / TILESIZE) as usize;
+// pub const MAPCOUNT: usize = MAPHEIGHT * MAPWIDTH;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum TileType {
@@ -18,29 +18,30 @@ pub enum TileType {
 pub struct Map {
     /// (0,0) is the bottom left most tile
     pub tiles: Vec<TileType>,
-    pub width: usize,
-    pub height: usize,
+    pub width: u32,
+    pub height: u32,
 }
 
 impl Map {
     /// Converts XY coordinate to index in tile vec
-    pub fn xy_idx(&self, x: usize, y: usize) -> usize {
-        (y as usize * self.width as usize) + x as usize
+    pub fn xy_idx(&self, x: u32, y: u32) -> u32 {
+        (y * self.width) + x
     }
 
     /// Converts index in tile vec to XY coordinate
-    pub fn idx_xy(&self, idx: usize) -> (usize, usize) {
-        let x: usize = idx % self.width;
+    pub fn idx_xy(&self, idx: u32) -> (u32, u32) {
+        let x = idx % self.width;
         let y = (idx - x) / self.height;
 
         (x, y)
     }
 
-    pub fn new() -> Map {
+    /// Create a new map consisting of only Wall tiles
+    pub fn new(width: u32, height: u32) -> Map {
         let map = Map {
-            tiles: vec![TileType::Wall; MAPCOUNT],
-            width: MAPWIDTH,
-            height: MAPHEIGHT,
+            tiles: vec![TileType::Wall; (width * height) as usize],
+            width,
+            height,
         };
 
         // Used for testing

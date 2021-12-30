@@ -20,7 +20,7 @@ version = "0.5"
 default-features = false
 # These are the remaining default features other than `bevy_audio` and `mp3`
 features = [
-  "bevy_dynamic_plugin",
+  "bevy_dynamic_plugin", # this is not dynamic compile
   "render",
   "bevy_wgpu",
   "bevy_winit",

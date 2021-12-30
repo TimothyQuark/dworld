@@ -17,6 +17,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        toolchain: [stable]
         include:
           - os: ubuntu-latest
             artifact_name: dworld
@@ -30,6 +31,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: ${{ matrix.toolchain }}
+        override: true
     - name: Install alsa and udev
       run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
       if: runner.os == 'linux'  

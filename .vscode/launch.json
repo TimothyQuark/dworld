@@ -10,11 +10,13 @@
             "request": "launch",            
             "cargo": {
                 "args": [
-                    "build"                    
+                    "build",
+                    // Bevy dynamic compile does not yet work on Windows
+                    // "--features bevy/dynamic"                   
                 ]
             },
             "program": "${cargo:program}",
-            "args": []
+            // "args": []
         },
         {
             "name": "Rust Debug 2",
@@ -22,7 +24,9 @@
             "request": "launch",
             "cargo": {
                 "args": [
-                    "build"
+                    "build",
+                    // Bevy dynamic compile does not yet work on Windows
+                    // "--features bevy/dynamic"  
                 ], // Cargo command line to build the debug target
                 // "args": ["build", "--bin=foo"] is another possibility
                 "filter": { // Filter applied to compilation artifacts (optional)
@@ -37,10 +41,12 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug Bevy",
+            "name": "Rust Debug 3",
             "cargo": {
                 "args": [
                     "build",
+                    // Bevy dynamic compile does not yet work on Windows
+                    // "--features bevy/dynamic" 
                     
                 ],
                 "filter": {

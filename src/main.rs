@@ -18,7 +18,7 @@ mod utilities;
 pub use utilities::*;
 
 fn main() {
-    App::build()
+    App::new()
         // Window Descriptor needs to exist when the game is build, hence
         // can't simply add to setup system. Same with black background color
         .insert_resource(WindowDescriptor {

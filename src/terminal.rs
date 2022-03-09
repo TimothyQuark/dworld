@@ -20,10 +20,14 @@ const TOP_SIDEBAR: f32 = 20.0;
 // Components
 
 /// Identifies entities used for drawing the game terminal (i.e. the map)
+#[derive(Component)]
 pub struct TerminalTile;
 // struct LeftSidebarText;
+#[derive(Component)]
 struct RightSidebar;
+#[derive(Component)]
 pub struct BottomSidebar;
+#[derive(Component)]
 struct TopSidebar;
 
 /*
@@ -61,7 +65,7 @@ pub fn setup_terminal(
     println!("Setting up the terminal");
 
     // Load sprite sheet into a texture atlas
-    let texture_handle: Handle<Texture> = assets.load("cp437_20x20_transparent.png");
+    let texture_handle= assets.load("cp437_20x20_transparent.png");
     let texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(20.0, 20.0), 16, 16);
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
 

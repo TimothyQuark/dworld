@@ -16,8 +16,8 @@ pub fn draw_gamelog_system(
 ) {
     // There should only be one bottom sidebar component in the World
     let mut sidebar = query
-        .single_mut()
-        .expect("There should only be one bottom sidebar");
+        .single_mut();
+        // .expect("There should only be one bottom sidebar");
     let idx = min(sidebar.sections.len(), log_resource.entries.len());
 
     for line in 0..idx {

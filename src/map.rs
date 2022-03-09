@@ -74,7 +74,7 @@ pub fn draw_map(
             transform.translation.x = terminal_x as f32;
             transform.translation.y = terminal_y as f32;
 
-            // Convert map Ttile to an index in the textureatlas
+            // Convert map tile to an index in the textureatlas
             // let (map_x, map_y) = map.idx_xy(idx);
             sprite.index = tiletype_to_spriteindex(map.tiles[idx]);
             idx += 1;
@@ -82,7 +82,7 @@ pub fn draw_map(
     }
 }
 
-fn tiletype_to_spriteindex(tile: TileType) -> u32 {
+fn tiletype_to_spriteindex(tile: TileType) -> usize {
     match tile {
         TileType::Wall => 35,
         TileType::Floor => 46,

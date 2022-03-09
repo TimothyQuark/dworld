@@ -65,7 +65,7 @@ pub fn setup_terminal(
     println!("Setting up the terminal");
 
     // Load sprite sheet into a texture atlas
-    let texture_handle= assets.load("cp437_20x20_transparent.png");
+    let texture_handle = assets.load("cp437_20x20_transparent.png");
     let texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(20.0, 20.0), 16, 16);
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
@@ -121,11 +121,11 @@ pub fn setup_terminal(
     commands
         .spawn_bundle(Text2dBundle {
             text: Text::with_section(
-                "Weather: Cold   Time: 10:51",
+                "Weather: Cold   Time: 10:51 (Default Text)",
                 text_style.clone(),
                 TextAlignment {
                     vertical: VerticalAlign::Center,
-                    horizontal: HorizontalAlign::Right,
+                    horizontal: HorizontalAlign::Left,
                 },
             ),
             transform: Transform {
@@ -145,15 +145,15 @@ pub fn setup_terminal(
             text: Text {
                 sections: vec![
                     TextSection {
-                        value: "-------------------------------------\n".to_string(),
+                        value: "------------------------------------- Add log text here\n".to_string(),
                         style: text_style.clone(),
                     };
                     // Number of sections should be as many lines as in the log
                     (BOTTOM_SIDEBAR / TILESIZE) as usize
                 ],
                 alignment: TextAlignment {
-                    vertical: VerticalAlign::Bottom,
-                    horizontal: HorizontalAlign::Right,
+                    vertical: VerticalAlign::Top,
+                    horizontal: HorizontalAlign::Left,
                 },
             },
             transform: Transform {
@@ -172,15 +172,15 @@ pub fn setup_terminal(
             text: Text {
                 sections: vec![
                     TextSection {
-                        value: "This is a line on the right side\n".to_string(),
+                        value: "This is a line on the right side (Default text)\n".to_string(),
                         style: text_style.clone(),
                     };
                     // Number of sections should be as many lines as in the log
                     ((SCREEN_HEIGHT - BOTTOM_SIDEBAR - TILESIZE) / TILESIZE) as usize
                 ],
                 alignment: TextAlignment {
-                    vertical: VerticalAlign::Bottom,
-                    horizontal: HorizontalAlign::Right,
+                    vertical: VerticalAlign::Top,
+                    horizontal: HorizontalAlign::Left,
                 },
             },
             transform: Transform {

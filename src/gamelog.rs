@@ -41,7 +41,7 @@ pub fn init_gamelog_system(mut commands: Commands, assets: Res<AssetServer>) {
         entries: vec![
             TextSection {
                 value: "This should be a new line in the gamelog\n".to_string(),
-                style: text_style.clone(),
+                style: text_style,
             };
             3
         ],

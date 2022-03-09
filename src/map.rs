@@ -44,15 +44,14 @@ impl Map {
             height,
         };
 
-        // Used for testing
-        // map.tiles[0] = TileType::Floor;
-        // map.tiles[3] = TileType::Floor;
+        println!("Default map resource created");
 
         map
     }
 }
 
-pub fn draw_map(
+/// Draws the map every frame
+pub fn draw_map_system(
     map: Res<Map>,
     mut query: Query<(&mut Transform, &mut TextureAtlasSprite), With<TerminalTile>>,
 ) {

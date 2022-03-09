@@ -173,7 +173,7 @@ pub fn setup_terminal(
                 sections: vec![
                     TextSection {
                         value: "This is a line on the right side (Default text)\n".to_string(),
-                        style: text_style.clone(),
+                        style: text_style,
                     };
                     // Number of sections should be as many lines as in the log
                     ((SCREEN_HEIGHT - BOTTOM_SIDEBAR - TILESIZE) / TILESIZE) as usize

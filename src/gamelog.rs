@@ -1,12 +1,9 @@
 use bevy::prelude::*;
 use std::cmp::min;
 
-use super::{default_textstyle, BottomSidebar};
-
-/// Component which holds the text of the game log.
-pub struct GameLog {
-    pub entries: Vec<TextSection>,
-}
+use super::components::gamelog::*;
+use super::components::rendering::*;
+use super::default_textstyle;
 
 // Take the entries in the game log resource, and display them on the bottom
 // sidebar

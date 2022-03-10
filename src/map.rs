@@ -1,20 +1,15 @@
 use bevy::prelude::*;
 
-use super::{screentiles_iterator, TerminalTile};
+use super::components::map::*;
+use super::components::rendering::*;
+use super::screentiles_iterator;
 
 // Map width and height, in number of tiles
 // pub const MAPWIDTH: usize = (SCREEN_WIDTH / TILESIZE) as usize;
 // pub const MAPHEIGHT: usize = (SCREEN_HEIGHT / TILESIZE) as usize;
 // pub const MAPCOUNT: usize = MAPHEIGHT * MAPWIDTH;
 
-#[derive(PartialEq, Copy, Clone)]
-pub enum TileType {
-    Wall,
-    Floor,
-    DownStairs,
-    UpStairs,
-}
-
+/// Resource that holds the current game map
 pub struct Map {
     /// (0,0) is the bottom left most tile
     pub tiles: Vec<TileType>,

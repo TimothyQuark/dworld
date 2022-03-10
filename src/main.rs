@@ -4,6 +4,8 @@ use bevy::prelude::*;
 pub mod map_builders;
 use map_builders::new_map_system;
 
+pub mod components;
+
 mod map;
 use bevy::window::WindowMode;
 pub use map::*;

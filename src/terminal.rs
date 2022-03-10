@@ -2,6 +2,8 @@ use std::iter::StepBy;
 
 use bevy::prelude::*;
 
+use super::components::rendering::*;
+
 use super::default_textstyle;
 
 // Systems that deal with the terminal/game window itself.
@@ -16,19 +18,6 @@ pub const SCREEN_HEIGHT: f32 = 720.0;
 const RIGHT_SIDEBAR: f32 = 280.0;
 const BOTTOM_SIDEBAR: f32 = 220.0;
 const TOP_SIDEBAR: f32 = 20.0;
-
-// Components
-
-/// Identifies entities used for drawing the game terminal (i.e. the map)
-#[derive(Component)]
-pub struct TerminalTile;
-// struct LeftSidebarText;
-#[derive(Component)]
-struct RightSidebar;
-#[derive(Component)]
-pub struct BottomSidebar;
-#[derive(Component)]
-struct TopSidebar;
 
 /*
 Note to self: it is basically impossible to see inside starting systems with

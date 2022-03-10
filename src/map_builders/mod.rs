@@ -1,10 +1,12 @@
 use bevy::prelude::*;
 
+use super::components::geometry::*;
+use super::components::map::TileType;
 use super::map::Map;
-use super::{AppState, TileType};
+use super::AppState;
 
 pub fn new_map_system(mut map: ResMut<Map>, mut state: ResMut<State<AppState>>) {
-    println!("Generating a new map");
+    println!("Generating a new map for depth -1 (TODO)");
 
     for x in 0..map.width {
         for y in 0..map.height {
@@ -28,11 +30,11 @@ pub fn new_map_system(mut map: ResMut<Map>, mut state: ResMut<State<AppState>>) 
 //     }
 // }
 
-// pub trait MapBuilder {
-//     fn build_map(&mut self);
-//     fn spawn_entities(&mut self, ecs: &mut World);
-//     fn get_map(&self) -> Map;
-//     fn get_starting_position(&self) -> Position;
-//     fn get_snapshot_history(&self) -> Vec<Map>;
-//     fn take_snapshot(&mut self);
-// }
+pub trait MapBuilder {
+    fn build_map(&mut self);
+    // fn spawn_entities(&mut self, ecs: &mut World);
+    fn get_map(&self) -> Map;
+    fn get_starting_position(&self) -> Position;
+    // fn get_snapshot_history(&self) -> Vec<Map>;
+    // fn take_snapshot(&mut self);
+}

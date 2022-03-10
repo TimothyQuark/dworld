@@ -2,7 +2,7 @@ use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
 
 pub mod map_builders;
-use map_builders::new_map_system;
+use map_builders::random_builder_system;
 
 pub mod components;
 
@@ -56,7 +56,7 @@ fn main() {
         .add_system(draw_gamelog_system.system())
         .add_system(draw_map_system.system())
         // .add_system_set(new_map_system.system())
-        .add_system_set(SystemSet::on_enter(AppState::NewMap).with_system(new_map_system))
+        .add_system_set(SystemSet::on_enter(AppState::NewMap).with_system(random_builder_system))
         .run();
 }
 

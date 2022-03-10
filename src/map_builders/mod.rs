@@ -5,20 +5,29 @@ use super::components::map::TileType;
 use super::map::Map;
 use super::AppState;
 
-pub fn new_map_system(mut map: ResMut<Map>, mut state: ResMut<State<AppState>>) {
-    println!("Generating a new map for depth -1 (TODO)");
+mod bsp_dungeon;
+use bsp_dungeon::BspDungeonBuilder;
 
-    for x in 0..map.width {
-        for y in 0..map.height {
-            let idx = map.xy_idx(x, y) as usize;
-            // let mut tile = &map.tiles[idx];
-            // let mut tile = map.as_ref().tiles[idx];
-            // let tiles = mut map.tiles[idx];
-            // *tiles = TileType::Floor;
-            map.tiles[idx] = TileType::Floor;
+pub fn random_builder_system(mut commands: Commands, mut state: ResMut<State<AppState>>) {
+    println!("Generating a new map for depth -1 (TODO)");
+    let new_depth = 0;
+
+    let rng = 1;
+    let mut result: Box<dyn MapBuilder>;
+    match rng {
+        1 => {
+            result = Box::new(BspDungeonBuilder::new(new_depth));
+            result.build_map();
+        }
+        _ => {
+            panic!("Undefined map builder selected");
         }
     }
 
+    let new_map = result.get_map();
+
+    // This will rewrite the previous map resource
+    commands.insert_resource(new_map);
     state.set(AppState::InGame).unwrap();
 }
 

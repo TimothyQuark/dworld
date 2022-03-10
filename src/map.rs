@@ -10,6 +10,7 @@ use super::screentiles_iterator;
 // pub const MAPCOUNT: usize = MAPHEIGHT * MAPWIDTH;
 
 /// Resource that holds the current game map
+#[derive(Clone)]
 pub struct Map {
     /// (0,0) is the bottom left most tile
     pub tiles: Vec<TileType>,
@@ -39,7 +40,7 @@ impl Map {
             height,
         };
 
-        println!("Default map resource created");
+        println!("New Map created (may not be added as resource)");
 
         map
     }

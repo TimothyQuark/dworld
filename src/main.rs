@@ -25,7 +25,7 @@ pub use utilities::*;
 mod geometry;
 
 mod systems;
-use systems::terminal::{init_terminal_system, render_terminal_system, Terminal};
+use systems::terminal::{init_terminal, render_terminal, Terminal};
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum AppState {
@@ -60,12 +60,12 @@ fn main() {
         })
         .insert_resource(ClearColor(Color::BLACK))
         .insert_resource(terminal)
-        .add_system(bevy::input::system::exit_on_esc_system.system())
         .add_plugins(DefaultPlugins)
         // .add_plugin(LogDiagnosticsPlugin::default())
         // .add_plugin(FrameTimeDiagnosticsPlugin::default())
-        .add_startup_system(setup.system().label("setup"))
-        .add_startup_system(init_terminal_system.system())
+        .add_system(bevy::input::system::exit_on_esc_system.system())     
+        .add_startup_system(init_camera.system().label("init_camera"))
+        .add_startup_system(init_terminal.system())
         // .add_startup_system(setup_terminal.system().after("setup"))
         // .add_startup_system(init_gamelog_system.system().after("setup"))
         // .add_system(print_resources.system())
@@ -74,20 +74,14 @@ fn main() {
         // .add_system(draw_map_system.system())
         // .add_system_set(new_map_system.system())
         // .add_system_set(SystemSet::on_enter(AppState::NewMap).with_system(random_builder_system))
-        .add_system(render_terminal_system.system())
+        .add_system(render_terminal.system())
         .run();
 }
 
-fn setup(mut commands: Commands, assets: Res<AssetServer>) {
+fn init_camera(mut commands: Commands) {
     println!("Initialize camera bundles");
 
     // Spawn camera and UI Camera bundles
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
     commands.spawn_bundle(UiCameraBundle::default());
-
-    // // Add a default map resource
-    // commands.insert_resource(Map::new(
-    //     (SCREEN_WIDTH / TILESIZE) as u32,
-    //     (SCREEN_WIDTH / TILESIZE) as u32,
-    // ));
 }

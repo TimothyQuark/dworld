@@ -1,7 +1,11 @@
 use bevy::prelude::*;
 
-use crate::components::rendering::TerminalTile;
+use crate::components::rendering::{TerminalTile, TopSidebar};
 use crate::text::{default_textstyle, DefaultTextStyle};
+
+// Layer order for different entities. Tiles at the back, text at the front
+const TILE_LAYER: f32 = 0.0;
+const TEXT_LAYER: f32 = 1.0;
 
 /// Terminal resource, contains all important information about the
 /// Game Window, such as screen dimensions, screen tile dimensions etc.
@@ -11,6 +15,7 @@ pub struct Terminal {
     screen_width: i32,
     screen_height: i32,
     terminal_tiles: Vec<(usize, Color)>, // Vec<(SpriteIndex, Color)
+    top_sidebar_text: String,
 }
 
 impl Default for Terminal {
@@ -29,9 +34,10 @@ impl Default for Terminal {
             screen_width: screen_width,
             screen_height: screen_height,
             terminal_tiles: vec![
-                (46, Color::BLUE);
+                (0, Color::BLUE);
                 (screen_width / tile_size * screen_height / tile_size) as usize
             ],
+            top_sidebar_text: "This is default text".to_string(),
         }
     }
 }
@@ -45,9 +51,10 @@ impl Terminal {
             screen_width,
             screen_height,
             terminal_tiles: vec![
-                (46, Color::BLUE);
+                (0, Color::BLUE);
                 (screen_width / tile_size * screen_height / tile_size) as usize
             ],
+            top_sidebar_text: "This is default text".to_string(),
         }
     }
     /// Returns screen dimensions, in pixels.
@@ -69,7 +76,7 @@ impl Terminal {
     }
 }
 
-pub fn init_terminal_system(
+pub fn init_terminal(
     mut commands: Commands,
     assets: Res<AssetServer>,
     terminal: Res<Terminal>,
@@ -91,7 +98,7 @@ pub fn init_terminal_system(
     // Load the default font and text style, and add as a resource.
     // Note that resources may not be accessible to startup systems.
     let default_text_style = default_textstyle(assets);
-    commands.insert_resource(DefaultTextStyle(default_text_style));
+    commands.insert_resource(DefaultTextStyle(default_text_style.clone()));
 
     // Spawn the Terminal Tile entities, which will be used to draw terminal contents
     // (terminal_tiles) to the screen
@@ -111,7 +118,7 @@ pub fn init_terminal_system(
                 .spawn_bundle(SpriteSheetBundle {
                     transform: Transform {
                         // Translation is middle of sprite, hence iterator uses stuff like tile_size / 2.0 etc
-                        translation: Vec3::new(x as f32, y as f32, 0.0),
+                        translation: Vec3::new(x as f32, y as f32, TILE_LAYER),
                         scale: Vec3::splat(1.0),
                         ..Default::default()
                     },
@@ -128,28 +135,48 @@ pub fn init_terminal_system(
             idx += 1;
         }
     }
+
+    // Spawn top sidebar text
+    commands
+        .spawn_bundle(Text2dBundle {
+            text: Text::with_section(
+                "You should not be seeing this text",
+                default_text_style.clone(),
+                TextAlignment {
+                    vertical: VerticalAlign::Center,
+                    horizontal: HorizontalAlign::Left,
+                },
+            ),
+            transform: Transform {
+                translation: Vec3::new(
+                    x_min as f32 - (terminal.tile_size / 2) as f32,
+                    y_max as f32 - (terminal.tile_size / 2) as f32,
+                    TEXT_LAYER,
+                ),
+                scale: Vec3::ONE,
+                ..Default::default()
+            },
+            ..Default::default()
+        })
+        .insert(TopSidebar);
 }
 
 /// System that renders the terminal every frame.
-pub fn render_terminal_system(
+pub fn render_terminal(
     // mut commands: Commands,
     mut query: Query<(&mut Transform, &mut TextureAtlasSprite, &TerminalTile), With<TerminalTile>>,
+    mut t_sidebar_query: Query<&mut Text, With<TopSidebar>>,
     terminal: Res<Terminal>,
 ) {
+    // Update the glyphs and colors of the terminal tiles
     let query_iter = query.iter_mut();
     for tile in query_iter {
         let (_, mut sprite, tile_component) = tile;
         sprite.index = terminal.terminal_tiles[tile_component.idx].0;
         sprite.color = terminal.terminal_tiles[tile_component.idx].1;
-
-        // let (terminal_width, terminal_height) = terminal.get_terminal_dim();
-        // let x = (tile.0.translation.x + (terminal.tile_size / 2) as f32) / (terminal.tile_size as f32);
-        // let y = (tile.0.translation.y + (terminal.tile_size / 2) as f32) / (terminal.tile_size as f32);
-
-        // println!(
-        //     "t_width: {}, t_height: {}, tran_x: {}, tran_y: {}, x:{}, y: {}",
-        //     terminal_width, terminal_height, tile.0.translation.x, tile.0.translation.y, x, y
-        // );
-        // let terminal_tile =
     }
+
+    // Update text of the top sidebar
+    let mut top_sidebar = t_sidebar_query.single_mut();
+    top_sidebar.sections[0].value = terminal.top_sidebar_text.clone();
 }

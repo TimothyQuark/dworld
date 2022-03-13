@@ -81,12 +81,12 @@ pub fn setup_terminal(
     color and index
     */
 
-    /* 
+    /*
     PROBLEM WITH MAP VISUALIZATION: Currently map size is tied to SCREEN_DIMENSIONS, but
     the map itself does not fill the entire screen. Need to decouple location of map tiles
     from the system that draws the tiles to the terminal.
-    */ 
-    
+    */
+
     for y in y_iterator {
         for x in x_iterator.clone() {
             // SpriteSheetBundle is a bundle of components, not a component itself.

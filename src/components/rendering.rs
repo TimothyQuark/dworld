@@ -2,7 +2,9 @@ use bevy::prelude::*;
 
 /// Component used to identify what to draw to terminal (i.e map tiles)
 #[derive(Component)]
-pub struct TerminalTile;
+pub struct TerminalTile {
+    pub idx: usize,
+}
 
 // struct LeftSidebarText;
 

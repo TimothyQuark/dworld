@@ -1,4 +1,4 @@
-use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
+// use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
 use bevy::window::WindowMode;
 
@@ -25,6 +25,7 @@ pub use utilities::*;
 mod geometry;
 
 mod systems;
+use systems::map::init_map;
 use systems::terminal::{init_terminal, render_terminal, Terminal};
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
@@ -63,9 +64,10 @@ fn main() {
         .add_plugins(DefaultPlugins)
         // .add_plugin(LogDiagnosticsPlugin::default())
         // .add_plugin(FrameTimeDiagnosticsPlugin::default())
-        .add_system(bevy::input::system::exit_on_esc_system.system())     
+        .add_system(bevy::input::system::exit_on_esc_system.system())
         .add_startup_system(init_camera.system().label("init_camera"))
         .add_startup_system(init_terminal.system())
+        .add_startup_system(init_map.system())
         // .add_startup_system(setup_terminal.system().after("setup"))
         // .add_startup_system(init_gamelog_system.system().after("setup"))
         // .add_system(print_resources.system())
@@ -75,6 +77,7 @@ fn main() {
         // .add_system_set(new_map_system.system())
         // .add_system_set(SystemSet::on_enter(AppState::NewMap).with_system(random_builder_system))
         .add_system(render_terminal.system())
+        // .add_system(render_map.system())
         .run();
 }
 

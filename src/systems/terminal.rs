@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
-use crate::components::rendering::{TerminalTile, TopSidebar};
+use crate::components::rendering::{BottomSidebar, RightSidebar, TerminalTile, TopSidebar};
+use crate::systems::map::Map;
 use crate::text::{default_textstyle, DefaultTextStyle};
 
 // Layer order for different entities. Tiles at the back, text at the front
@@ -11,11 +12,24 @@ const TEXT_LAYER: f32 = 1.0;
 /// Game Window, such as screen dimensions, screen tile dimensions etc.
 pub struct Terminal {
     // TODO: Tile is currently a square, change to be a rectangle
-    tile_size: i32,
-    screen_width: i32,
-    screen_height: i32,
-    terminal_tiles: Vec<(usize, Color)>, // Vec<(SpriteIndex, Color)
+    tile_size: u32,
+    screen_width: u32,
+    screen_height: u32,
+    terminal_width: u32,
+    terminal_height: u32,
+
+    pub terminal_tiles: Vec<(usize, Color)>, // Vec<(SpriteIndex, Color)
+
     top_sidebar_text: String,
+    bottom_sidebar_text: Vec<String>,
+    right_sidebar_text: Vec<String>,
+
+    // In number of tiles. Fully dimensions the terminal
+    // TODO: Make private, accessible only with function. Also add calculation
+    // for right_sidebar_width, not attribute but still useful.
+    pub top_sidebar_height: u32,
+    pub bottom_sidebar_height: u32,
+    pub right_sidebar_width: u32,
 }
 
 impl Default for Terminal {
@@ -29,15 +43,26 @@ impl Default for Terminal {
         let screen_width = 1080;
         let screen_height = 720;
 
+        let terminal_width = screen_width / tile_size;
+        let terminal_height = screen_height / tile_size;
+
         Self {
-            tile_size: tile_size,
-            screen_width: screen_width,
-            screen_height: screen_height,
+            tile_size,
+            screen_width,
+            screen_height,
+            terminal_width,
+            terminal_height,
             terminal_tiles: vec![
                 (0, Color::BLUE);
                 (screen_width / tile_size * screen_height / tile_size) as usize
             ],
             top_sidebar_text: "This is default text".to_string(),
+            bottom_sidebar_text: vec!["Bottom sidebar text (From Terminal) \n".to_string(); 11],
+            right_sidebar_text: vec!["Right sidebar text (From Terminal)\n".to_string(); 11],
+
+            top_sidebar_height: 1,
+            bottom_sidebar_height: 11,
+            right_sidebar_width: 14,
         }
     }
 }
@@ -45,34 +70,53 @@ impl Default for Terminal {
 impl Terminal {
     #![allow(dead_code)]
     /// Create Terminal resource with custom settings
-    fn new(tile_size: i32, screen_width: i32, screen_height: i32) -> Self {
+    fn new(tile_size: u32, screen_width: u32, screen_height: u32) -> Self {
+        // TODO: Other terminal settings should be customizable from here
+        let terminal_width = screen_width / tile_size;
+        let terminal_height = screen_height / tile_size;
+
         Self {
-            tile_size: tile_size,
+            tile_size,
             screen_width,
             screen_height,
+            terminal_width,
+            terminal_height,
             terminal_tiles: vec![
                 (0, Color::BLUE);
                 (screen_width / tile_size * screen_height / tile_size) as usize
             ],
             top_sidebar_text: "This is default text".to_string(),
+            ..Default::default()
         }
     }
     /// Returns screen dimensions, in pixels.
     ///
     /// (screen_width, screen_height)
 
-    pub fn get_screen_dim(&self) -> (i32, i32) {
+    pub fn get_screen_dim(&self) -> (u32, u32) {
         (self.screen_width, self.screen_height)
     }
 
     /// Returns terminal dimensions, in tiles
     ///
     /// (terminal_width, terminal_height)
-    pub fn get_terminal_dim(&self) -> (i32, i32) {
-        (
-            self.screen_width / self.tile_size,
-            self.screen_height / self.tile_size,
-        )
+    pub fn get_terminal_dim(&self) -> (u32, u32) {
+        (self.terminal_width, self.terminal_height)
+    }
+
+    /// Converts XY coordinate to index of terminal_tile
+    pub fn xy_idx(&self, x: u32, y: u32) -> usize {
+        ((y * self.terminal_width) + x) as usize
+    }
+
+    /// Converts terminal_tile index in tile vec to XY coordinate
+    /// returns (x,y)
+    pub fn idx_xy(&self, idx: u32) -> (u32, u32) {
+        let x = idx % self.terminal_width;
+        let y = (idx - x) / self.terminal_width;
+        // let y = idx / self.width;
+
+        (x, y)
     }
 }
 
@@ -105,14 +149,15 @@ pub fn init_terminal(
     // Bevy uses coordinate system where center of screen is (0,0), also
     // sprite translation is center of sprite. Need lots of awful
     // coordinate shifting
-    let x_min = (-1 * terminal.screen_width / 2) + terminal.tile_size / 2;
-    let x_max = (terminal.screen_width) / 2;
-    let y_min = (-1 * terminal.screen_height / 2) + terminal.tile_size / 2;
-    let y_max = (terminal.screen_height) / 2;
+    let x_min: i32 = (-1 * terminal.screen_width as i32 / 2) + terminal.tile_size as i32 / 2;
+    let x_max: i32 = (terminal.screen_width as i32) / 2;
+    let y_min: i32 = (-1 * terminal.screen_height as i32 / 2) + terminal.tile_size as i32 / 2;
+    let y_max: i32 = (terminal.screen_height as i32) / 2;
 
     let mut idx: usize = 0;
-    for x in (x_min..x_max).step_by(terminal.tile_size as usize) {
-        for y in (y_min..y_max).step_by(terminal.tile_size as usize) {
+    // Order of these loops matters because it sets idx
+    for y in (y_min..y_max).step_by(terminal.tile_size as usize) {
+        for x in (x_min..x_max).step_by(terminal.tile_size as usize) {
             // println!("x:{}, y: {}", x, y);
             commands
                 .spawn_bundle(SpriteSheetBundle {
@@ -159,24 +204,122 @@ pub fn init_terminal(
             ..Default::default()
         })
         .insert(TopSidebar);
+
+    // Spawn bottom sidebar text
+    commands
+        .spawn_bundle(Text2dBundle {
+            text: Text {
+                sections: vec![
+                    TextSection {
+                        value: "------------------------------------- Add log text here (Should not see this text)\n".to_string(),
+                        style: default_text_style.clone(),
+                    };
+                    // Number of sections should be as many lines as in the log
+                    terminal.bottom_sidebar_height as usize
+                ],
+                alignment: TextAlignment {
+                    vertical: VerticalAlign::Bottom,
+                    horizontal: HorizontalAlign::Left,
+                },
+            },
+            transform: Transform {
+                // translation: Vec3::new(-half_x as f32, (-half_y as f32) + BOTTOM_SIDEBAR, 0.0),
+                translation: Vec3::new(x_min as f32 - (terminal.tile_size as f32 / 2.0),y_min as f32 - (terminal.tile_size as f32 / 2.0), TEXT_LAYER),
+                scale: Vec3::ONE,
+                ..Default::default()
+            },
+            ..Default::default()
+        })
+        .insert(BottomSidebar);
+
+    // Spawn right sidebar text
+    commands
+        .spawn_bundle(Text2dBundle {
+            text: Text {
+                sections: vec![
+                    TextSection {
+                        value: "Line on the right side (Should not see this text)\n".to_string(),
+                        style: default_text_style.clone(),
+                    };
+                    // Number of sections should be as many lines as in the log
+                    // (terminal.terminal_height - terminal.top_sidebar_height) as usize
+                    3
+                ],
+                alignment: TextAlignment {
+                    vertical: VerticalAlign::Top,
+                    horizontal: HorizontalAlign::Left,
+                },
+            },
+            transform: Transform {
+                // Start one line below the top sidebar so they do not overlap
+                translation: Vec3::new(
+                    x_max as f32 - (terminal.right_sidebar_width * terminal.tile_size) as f32,
+                    y_max as f32 - (terminal.top_sidebar_height * terminal.tile_size) as f32,
+                    TEXT_LAYER,
+                ),
+                scale: Vec3::ONE,
+                ..Default::default()
+            },
+            ..Default::default()
+        })
+        .insert(RightSidebar);
 }
 
 /// System that renders the terminal every frame.
 pub fn render_terminal(
     // mut commands: Commands,
-    mut query: Query<(&mut Transform, &mut TextureAtlasSprite, &TerminalTile), With<TerminalTile>>,
-    mut t_sidebar_query: Query<&mut Text, With<TopSidebar>>,
-    terminal: Res<Terminal>,
+    map: Res<Map>,
+    mut terminal: ResMut<Terminal>,
+    // QuerySet limited to 4 QueryState
+    mut q: QuerySet<(
+        QueryState<(&mut Transform, &mut TextureAtlasSprite, &TerminalTile), With<TerminalTile>>,
+        QueryState<&mut Text, With<TopSidebar>>,
+        QueryState<&mut Text, With<RightSidebar>>,
+        QueryState<&mut Text, With<BottomSidebar>>,
+    )>, // mut query: Query<(&mut Transform, &mut TextureAtlasSprite, &TerminalTile), With<TerminalTile>>,
+        // mut t_sidebar_query: Query<&mut Text, With<TopSidebar>>,
+        // mut b_sidebar_query: Query<&mut Text, With<BottomSidebar>>,
+        // mut r_sidebar_query: Query<&mut Text, With<RightSidebar>>
 ) {
+    // Update text of the top sidebar
+    // let mut top_sidebar = q.q1().single_mut();
+    // top_sidebar.sections[0].value = terminal.top_sidebar_text.clone();
+    q.q1().single_mut().sections[0].value = terminal.top_sidebar_text.clone();
+
+    // Update text of the right sidebar
+    for (idx, mut line) in q.q2().single_mut().sections.iter_mut().enumerate() {
+        // line.value = "Test \n".to_string();
+        line.value = terminal.right_sidebar_text[idx].clone();
+    }
+
+    // Update text of the bottom sidebar
+    for (idx, mut line) in q.q3().single_mut().sections.iter_mut().enumerate() {
+        // line.value = "Test \n".to_string();
+        line.value = terminal.bottom_sidebar_text[idx].clone();
+    }
+
+    // Draw the map using the remaining tiles
+
+    for (map_idx, map_tile) in map.tiles.clone().into_iter().enumerate() {
+        let (map_x_idx, map_y_idx) = map.idx_xy(map_idx as u32);
+        // let (terminal_width, terminal_height) = terminal.get_terminal_dim();
+
+        if map_x_idx < (terminal.terminal_width - terminal.right_sidebar_width)
+            && map_y_idx < terminal.terminal_height - terminal.top_sidebar_height
+            && map_y_idx >= terminal.bottom_sidebar_height
+        {
+            // println!("map_idx: {}, map_x_idx: {}, map_y_idx: {}", map_idx, map_x_idx, map_y_idx);
+            // Convert map_idx to terminal_idx
+            let terminal_idx = terminal.xy_idx(map_x_idx, map_y_idx);
+            terminal.terminal_tiles[terminal_idx].0 = Map::maptiletype_to_spriteidx(map_tile);
+        }
+    }
+
     // Update the glyphs and colors of the terminal tiles
-    let query_iter = query.iter_mut();
-    for tile in query_iter {
+    // let query_iter = q.q0().iter_mut();
+    for tile in q.q0().iter_mut() {
         let (_, mut sprite, tile_component) = tile;
         sprite.index = terminal.terminal_tiles[tile_component.idx].0;
         sprite.color = terminal.terminal_tiles[tile_component.idx].1;
     }
-
-    // Update text of the top sidebar
-    let mut top_sidebar = t_sidebar_query.single_mut();
-    top_sidebar.sections[0].value = terminal.top_sidebar_text.clone();
 }

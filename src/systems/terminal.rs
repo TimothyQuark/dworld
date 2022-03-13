@@ -92,7 +92,6 @@ impl Terminal {
     /// Returns screen dimensions, in pixels.
     ///
     /// (screen_width, screen_height)
-
     pub fn get_screen_dim(&self) -> (u32, u32) {
         (self.screen_width, self.screen_height)
     }

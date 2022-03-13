@@ -5,6 +5,8 @@ use super::components::gamelog::*;
 use super::components::rendering::*;
 use super::default_textstyle;
 
+// TODO: Move into systems mod and completely rewrite cleanly
+
 // Take the entries in the game log resource, and display them on the bottom
 // sidebar
 pub fn draw_gamelog_system(

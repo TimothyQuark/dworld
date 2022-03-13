@@ -2,8 +2,6 @@ use bevy::prelude::*;
 
 use crate::components::map::*;
 
-use super::terminal::Terminal;
-
 /// Resource that holds the game map
 #[derive(Clone)]
 pub struct Map {

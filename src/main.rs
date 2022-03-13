@@ -7,12 +7,6 @@ use bevy::window::WindowMode;
 
 pub mod components;
 
-// mod map;
-// pub use map::*;
-
-// mod terminal;
-// pub use terminal::*;
-
 mod gamelog;
 pub use gamelog::*;
 
@@ -55,7 +49,7 @@ fn main() {
             width: screen_width as f32,
             height: screen_height as f32,
             vsync: true,
-            resizable: true,
+            resizable: false,
             mode: WindowMode::Windowed,
             ..Default::default()
         })
@@ -73,11 +67,9 @@ fn main() {
         // .add_system(print_resources.system())
         // .add_system(change_sprite_colors.system())
         // .add_system(draw_gamelog_system.system())
-        // .add_system(draw_map_system.system())
         // .add_system_set(new_map_system.system())
         // .add_system_set(SystemSet::on_enter(AppState::NewMap).with_system(random_builder_system))
         .add_system(render_terminal.system())
-        // .add_system(render_map.system())
         .run();
 }
 

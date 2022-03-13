@@ -1,5 +1,6 @@
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
+use bevy::window::WindowMode;
 
 pub mod map_builders;
 use map_builders::random_builder_system;
@@ -7,7 +8,6 @@ use map_builders::random_builder_system;
 pub mod components;
 
 mod map;
-use bevy::window::WindowMode;
 pub use map::*;
 
 mod terminal;
@@ -21,6 +21,8 @@ pub use text::*;
 
 mod utilities;
 pub use utilities::*;
+
+mod geometry;
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum AppState {
@@ -74,5 +76,8 @@ fn setup(mut commands: Commands, assets: Res<AssetServer>) {
     commands.insert_resource(DefaultTextStyle(default_text_style));
 
     // Add a default map resource
-    commands.insert_resource(Map::new(SCREEN_WIDTH as u32, SCREEN_HEIGHT as u32));
+    commands.insert_resource(Map::new(
+        (SCREEN_WIDTH / TILESIZE) as u32,
+        (SCREEN_WIDTH / TILESIZE) as u32,
+    ));
 }

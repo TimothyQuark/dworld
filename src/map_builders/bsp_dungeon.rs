@@ -1,3 +1,5 @@
+use bevy::prelude::*;
+
 use rand::prelude::*;
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
@@ -6,8 +8,9 @@ use super::{
     common::{apply_room_to_map, draw_corridor},
     Map, MapBuilder, Position,
 };
+use crate::components::map::MapTileType;
 use crate::geometry::Rect;
-use crate::{components::map::TileType, SCREEN_HEIGHT, SCREEN_WIDTH, TILESIZE};
+// use crate::{components::map::TileType, SCREEN_HEIGHT, SCREEN_WIDTH, TILESIZE};
 
 pub struct BspDungeonBuilder {
     map: Map,
@@ -31,6 +34,8 @@ impl MapBuilder for BspDungeonBuilder {
         self.build();
     }
 
+    fn spawn_entities(&mut self, ecs: &mut World) {}
+
     // fn spawn_entities(&mut self, ecs : &mut World) {
     //     for room in self.rooms.iter().skip(1) {
     //         spawner::spawn_room(ecs, room, self.depth);
@@ -43,10 +48,7 @@ impl BspDungeonBuilder {
         println!("New BspDungeonBuilder created (map needs to be built)");
         BspDungeonBuilder {
             // TODO: Decouple map size from screen dimensions
-            map: Map::new(
-                (SCREEN_WIDTH / TILESIZE) as u32,
-                (SCREEN_HEIGHT / TILESIZE) as u32,
-            ),
+            map: Map::default(),
             starting_position: Position { x: 0, y: 0 },
             depth: new_depth,
             rooms: Vec::new(),
@@ -62,13 +64,13 @@ impl BspDungeonBuilder {
 
         self.rects.clear();
         self.rects.push(Rect::new(
-            10,
-            10,
-            self.map.width as i32 - 5,
-            self.map.height as i32 - 5,
+            1,
+            1,
+            self.map.width as i32 - 4,
+            self.map.height as i32 - 4,
         )); // Start with a single map-sized rectangle
         let first_room: Rect = self.rects[0];
-        // self.add_subrects(first_room); // Divide the first room
+        self.add_subrects(first_room); // Divide the first room
 
         // REMOVE THIS AFTER TESTING
         apply_room_to_map(&mut self.map, &first_room);
@@ -125,13 +127,13 @@ impl BspDungeonBuilder {
         // };
 
         // Random code to try and see if this works
-        // for x in 0..self.map.width {
-        //     for y in 0..self.map.height {
+        // for x in 1..self.map.width - 1 {
+        //     for y in 1..self.map.height - 1 {
         //         let idx = self.map.xy_idx(x, y) as usize;
-        //         self.map.tiles[idx] = TileType::Floor;
+        //         self.map.tiles[idx] = MapTileType::Floor;
         //     }
         // }
-        // self.map.tiles[15] = TileType::Wall;
+        // self.map.tiles[15] = MapTileType::Wall;
 
         println!("BspDungeonBuilder has built a dungeon");
     }
@@ -168,7 +170,8 @@ impl BspDungeonBuilder {
         if self.rects.len() == 1 {
             return self.rects[0];
         }
-        let idx = (rng.gen_range(1..=self.rects.len() as i32) - 1) as usize;
+        let idx = rng.gen_range(1..=self.rects.len()) - 1;
+        println!("rand_rect idx: {}", idx);
         self.rects[idx]
     }
 
@@ -213,7 +216,7 @@ impl BspDungeonBuilder {
                 }
                 if can_build {
                     let idx = self.map.xy_idx(x as u32, y as u32);
-                    if self.map.tiles[idx as usize] != TileType::Wall {
+                    if self.map.tiles[idx as usize] != MapTileType::Wall {
                         can_build = false;
                     }
                 }

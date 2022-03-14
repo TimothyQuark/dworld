@@ -14,8 +14,8 @@ impl Default for Map {
     /// Create a 200 by 100 tile map of walls
     fn default() -> Self {
         println!("Default map initialized (still need to add as a resource)");
-        let width: u32 = 200;
-        let height: u32 = 100;
+        let width: u32 = 40;
+        let height: u32 = 24;
 
         // Downstairs used so it is obvious this should not be used
         Self {

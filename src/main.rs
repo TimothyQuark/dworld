@@ -2,8 +2,8 @@
 use bevy::prelude::*;
 use bevy::window::WindowMode;
 
-// pub mod map_builders;
-// use map_builders::random_builder_system;
+mod map_builders;
+use map_builders::build_new_map;
 
 pub mod components;
 
@@ -25,7 +25,7 @@ use systems::terminal::{init_terminal, render_terminal, Terminal};
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum AppState {
     MainMenu,
-    NewMap,
+    NewGame,
     InGame,
 }
 
@@ -43,7 +43,7 @@ fn main() {
     let (screen_width, screen_height) = terminal.get_screen_dim();
 
     App::new()
-        .add_state(AppState::MainMenu)
+        .add_state(AppState::NewGame)
         .insert_resource(WindowDescriptor {
             title: "DWorld".to_string(),
             width: screen_width as f32,
@@ -68,7 +68,7 @@ fn main() {
         // .add_system(change_sprite_colors.system())
         // .add_system(draw_gamelog_system.system())
         // .add_system_set(new_map_system.system())
-        // .add_system_set(SystemSet::on_enter(AppState::NewMap).with_system(random_builder_system))
+        .add_system_set(SystemSet::on_enter(AppState::NewGame).with_system(build_new_map))
         .add_system(render_terminal.system())
         .run();
 }

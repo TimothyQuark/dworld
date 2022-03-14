@@ -303,13 +303,19 @@ pub fn render_terminal(
         let (map_x_idx, map_y_idx) = map.idx_xy(map_idx as u32);
         // let (terminal_width, terminal_height) = terminal.get_terminal_dim();
 
-        if map_x_idx < (terminal.terminal_width - terminal.right_sidebar_width)
-            && map_y_idx < terminal.terminal_height - terminal.top_sidebar_height
-            && map_y_idx >= terminal.bottom_sidebar_height
+        // Shift map_y_idx up so it is not covered by the game log. Nothing need to
+        // be done with map_x_idx for now.
+        let term_y_idx = map_y_idx + terminal.bottom_sidebar_height;
+        let term_x_idx = map_x_idx;
+
+        if term_x_idx < (terminal.terminal_width - terminal.right_sidebar_width)
+            && term_y_idx < terminal.terminal_height - terminal.top_sidebar_height
+            && term_y_idx >= terminal.bottom_sidebar_height
         {
             // println!("map_idx: {}, map_x_idx: {}, map_y_idx: {}", map_idx, map_x_idx, map_y_idx);
+
             // Convert map_idx to terminal_idx
-            let terminal_idx = terminal.xy_idx(map_x_idx, map_y_idx);
+            let terminal_idx = terminal.xy_idx(term_x_idx, term_y_idx);
             terminal.terminal_tiles[terminal_idx].0 = Map::maptiletype_to_spriteidx(map_tile);
         }
     }

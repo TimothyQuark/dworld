@@ -2,8 +2,61 @@
 name = "dworld"
 version = "0.1.0"
 edition = "2021"
+authors = ["TimothyQuark"]
+description = "A small hobby Roguelike game which uses Bevy and the ESC design pattern"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/TimothyQuark/dworld"
+
+
+
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy = "0.5"
+pathfinding = "3.0.10"
+rand =  {version = "0.8.4", features = ["small_rng"]}
+
+[dependencies.bevy]
+version = "0.6.1"
+default-features = false
+# These are the remaining default features other than `bevy_audio` and `mp3`.
+# Leave out unnecessary features.
+features = [
+  "bevy_dynamic_plugin", # this is not dynamic compile
+  "render",
+  # "bevy_wgpu",
+  "bevy_winit",
+  "bevy_gilrs",
+  "bevy_gltf",
+  "png",
+  "hdr",
+  "wayland",
+]
+
+# [dev-dependencies]
+# bevy = { version = "0.5.0", features = ["dynamic"] }
+
+# [dependencies.bevy_kira_audio]
+# version = "0.5.0"
+# # `ogg` format support is enabled by default, disable if you don't want it
+# default-features = false
+# # enable the features you care about
+# features = [
+#   "wav",
+#   "flac",
+#   "mp3",
+#   "ogg",
+# ]
+
+# [profile.dev]
+# opt-level = 0
+# debug = true
+# split-debuginfo = '...'  # Platform-specific.
+# debug-assertions = true
+# overflow-checks = true
+# lto = false
+# panic = 'unwind'
+# incremental = true
+# codegen-units = 256
+# rpath = false

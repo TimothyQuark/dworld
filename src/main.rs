@@ -1,79 +1,84 @@
+// use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
+use bevy::window::WindowMode;
 
-mod map;
-pub use map::*;
+mod map_builders;
+use map_builders::build_new_map;
 
-const SCREEN_WIDTH: f32 = 200.0;
-const SCREEN_HEIGHT: f32 = 200.0;
-const TILESIZE: f32 = 20.0;
+pub mod components;
+
+mod gamelog;
+pub use gamelog::*;
+
+mod text;
+pub use text::*;
+
+mod utilities;
+pub use utilities::*;
+
+mod geometry;
+
+mod systems;
+use systems::{
+    input::player_input,
+    map::init_map,
+    player::init_player,
+    terminal::{init_terminal, render_terminal, Terminal},
+};
+
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+pub enum AppState {
+    MainMenu,
+    NewGame,
+    AwaitingInput,
+    InGame,
+}
 
 fn main() {
-    App::build()
+    /*
+    Window Descriptor needs to exist when the game is build, hence
+    can't simply add to setup system. Same with black background color,
+    needs to be added a resource ahead of time.
+
+    Initial state: Main Menu
+    */
+
+    // Terminal resource
+    let terminal = Terminal::default();
+    let (screen_width, screen_height) = terminal.get_screen_dim();
+
+    App::new()
+        .add_state(AppState::NewGame)
         .insert_resource(WindowDescriptor {
             title: "DWorld".to_string(),
-            width: SCREEN_HEIGHT,
-            height: SCREEN_WIDTH,
+            width: screen_width as f32,
+            height: screen_height as f32,
             vsync: true,
+            resizable: false,
+            mode: WindowMode::Windowed,
             ..Default::default()
         })
         .insert_resource(ClearColor(Color::BLACK))
+        .insert_resource(terminal)
         .add_plugins(DefaultPlugins)
-        .add_startup_system(setup.system())
-        .add_system(change_sprite_colors.system())
+        // .add_plugin(LogDiagnosticsPlugin::default())
+        // .add_plugin(FrameTimeDiagnosticsPlugin::default())
+        // .add_system(print_resources.system())
+        .add_system(bevy::input::system::exit_on_esc_system.system())
+        .add_startup_system(init_camera.system().label("init_camera"))
+        .add_startup_system(init_terminal.system())
+        .add_startup_system(init_map.system())
+        .add_startup_system(init_player.system())
+        .add_system_set(SystemSet::on_enter(AppState::NewGame).with_system(build_new_map))
+        .add_system(render_terminal.system())
+        .add_system(player_input.system())
         .run();
 }
 
-fn setup(
-    mut commands: Commands,
-    assets: Res<AssetServer>,
-    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
-) {
+fn init_camera(mut commands: Commands) {
+    println!("Initialize camera bundles");
+
+    // Spawn camera and UI Camera bundles
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
     commands.spawn_bundle(UiCameraBundle::default());
-
-    let texture_handle: Handle<Texture> = assets.load("cp437_20x20_transparent.png");
-    let texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(20.0, 20.0), 16, 16);
-    let texture_atlas_handle = texture_atlases.add(texture_atlas);
-
-    let tile_size = Vec2::splat(TILESIZE);
-    // let map_size = Vec2::new(1080.0, 640.0);
-    let map_size = Vec2::new(SCREEN_WIDTH, SCREEN_HEIGHT);
-
-    let half_x = (map_size.x / 2.0) as i32;
-    let half_y = (map_size.y / 2.0) as i32;
-
-    let mut sprites = vec![];
-
-    for y in (-half_y + (tile_size[1] / 2.0) as i32..half_y).step_by(tile_size[1] as usize) {
-        for x in (-half_x + (tile_size[1] / 2.0) as i32..half_x).step_by(tile_size[0] as usize) {
-            sprites.push(SpriteSheetBundle {
-                transform: Transform {
-                    translation: Vec3::new(x as f32, y as f32, 0.0),
-                    scale: Vec3::splat(1.0),
-                    ..Default::default()
-                },
-                sprite: TextureAtlasSprite {
-                    color: Color::BLUE,
-                    index: 6,
-                    ..Default::default()
-                },
-                texture_atlas: texture_atlas_handle.clone(),
-                ..Default::default()
-            });
-        }
-    }
-
-    commands.spawn_batch(sprites);
-}
-
-fn change_sprite_colors(mut query: Query<&mut TextureAtlasSprite>) {
-    let mut red = false;
-    for mut sprite in &mut query.iter_mut() {
-        red = !red;
-        if red {
-            sprite.color = Color::RED
-        } else {
-            sprite.color = Color::BLUE
-        }
-    }
 }

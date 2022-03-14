@@ -48,7 +48,7 @@ impl BspDungeonBuilder {
         println!("New BspDungeonBuilder created (map needs to be built)");
         BspDungeonBuilder {
             // TODO: Decouple map size from screen dimensions
-            map: Map::default(),
+            map: Map::new(40, 24),
             starting_position: Position { x: 0, y: 0 },
             depth: new_depth,
             rooms: Vec::new(),
@@ -58,8 +58,8 @@ impl BspDungeonBuilder {
     }
 
     fn build(&mut self) {
-        // let mut rng = SmallRng::from_rng(thread_rng()).unwrap();
-        let mut rng = SmallRng::seed_from_u64(100);
+        // let mut rng = SmallRng::seed_from_u64(100);
+        let mut rng = SmallRng::from_entropy();
         // println!("{}", rng.gen_range(0..100));
 
         self.rects.clear();
@@ -72,59 +72,57 @@ impl BspDungeonBuilder {
         let first_room: Rect = self.rects[0];
         self.add_subrects(first_room); // Divide the first room
 
-        // REMOVE THIS AFTER TESTING
-        apply_room_to_map(&mut self.map, &first_room);
-        println!(
-            "x1: {}, x2: {}, y1: {}, y2: {}",
-            first_room.x1, first_room.x2, first_room.y1, first_room.y2
-        );
+        // // REMOVE THIS AFTER TESTING
+        // apply_room_to_map(&mut self.map, &first_room);
+        // println!(
+        //     // "x1: {}, x2: {}, y1: {}, y2: {}",
+        //     first_room.x1, first_room.x2, first_room.y1, first_room.y2
+        // );
 
-        // Up to 240 times, we get a random rectangle and divide it. If its possible to squeeze a
+        // Up to 360 times, we get a random rectangle and divide it. If its possible to squeeze a
         // room in there, we place it and add it to the rooms list.
-        // let mut n_rooms = 0;
-        // while n_rooms < 240 {
-        //     let rect = self.get_random_rect(&mut rng);
-        //     let candidate = self.get_random_sub_rect(rect, &mut rng);
+        let mut n_rooms = 0;
+        while n_rooms < 360 {
+            let rect = self.get_random_rect(&mut rng);
+            let candidate = self.get_random_sub_rect(rect, &mut rng);
 
-        //     if self.is_possible(candidate) {
-        //         apply_room_to_map(&mut self.map, &candidate);
-        //         self.rooms.push(candidate);
-        //         self.add_subrects(rect);
-        //         // self.take_snapshot();
-        //     }
+            if self.is_possible(candidate) {
+                apply_room_to_map(&mut self.map, &candidate);
+                self.rooms.push(candidate);
+                self.add_subrects(rect);
+                // self.take_snapshot();
+            }
 
-        //     n_rooms += 1;
-        // }
+            n_rooms += 1;
+        }
 
-        // // Now we sort the rooms
-        // self.rooms.sort_by(|a, b| a.x1.cmp(&b.x1));
+        // Now we sort the rooms
+        self.rooms.sort_by(|a, b| a.x1.cmp(&b.x1));
 
-        // // Now we want corridors
-        // for i in 0..self.rooms.len() - 1 {
-        //     let room = self.rooms[i];
-        //     let next_room = self.rooms[i + 1];
-        //     let start_x = room.x1 + (rng.gen_range(1..=i32::abs(room.x1 - room.x2)) - 1);
-        //     let start_y = room.y1 + (rng.gen_range(1..=i32::abs(room.y1 - room.y2)) - 1);
-        //     let end_x =
-        //         next_room.x1 + (rng.gen_range(1..=i32::abs(next_room.x1 - next_room.x2)) - 1);
-        //     let end_y =
-        //         next_room.y1 + (rng.gen_range(1..=i32::abs(next_room.y1 - next_room.y2)) - 1);
-        //     draw_corridor(&mut self.map, start_x, start_y, end_x, end_y);
-        //     // self.take_snapshot();
-        // }
+        // Now we want corridors, which connect room to it's nearest left neighbor
+        for i in 0..self.rooms.len() - 1 {
+            let room = self.rooms[i];
+            let next_room = self.rooms[i + 1];
+            let start_x = room.x1 + (rng.gen_range(1..=i32::abs(room.x1 - room.x2)));
+            let start_y = room.y1 + (rng.gen_range(1..=i32::abs(room.y1 - room.y2)));
+            let end_x = next_room.x1 + (rng.gen_range(1..=i32::abs(next_room.x1 - next_room.x2)));
+            let end_y = next_room.y1 + (rng.gen_range(1..=i32::abs(next_room.y1 - next_room.y2)));
+            draw_corridor(&mut self.map, start_x, start_y, end_x, end_y);
+            // self.take_snapshot();
+        }
 
-        // // Don't forget the stairs
-        // let stairs = self.rooms[self.rooms.len() - 1].center();
-        // let stairs_idx = self.map.xy_idx(stairs.0 as u32, stairs.1 as u32);
-        // self.map.tiles[stairs_idx as usize] = TileType::DownStairs;
-        // // self.take_snapshot();
+        // Don't forget the stairs
+        let stairs = self.rooms[self.rooms.len() - 1].center();
+        let stairs_idx = self.map.xy_idx(stairs.0 as u32, stairs.1 as u32);
+        self.map.tiles[stairs_idx as usize] = MapTileType::DownStairs;
+        // self.take_snapshot();
 
-        // // Set player start
-        // let start = self.rooms[0].center();
-        // self.starting_position = Position {
-        //     x: start.0,
-        //     y: start.1,
-        // };
+        // Set player start
+        let start = self.rooms[0].center();
+        self.starting_position = Position {
+            x: start.0,
+            y: start.1,
+        };
 
         // Random code to try and see if this works
         // for x in 1..self.map.width - 1 {
@@ -171,7 +169,7 @@ impl BspDungeonBuilder {
             return self.rects[0];
         }
         let idx = rng.gen_range(1..=self.rects.len()) - 1;
-        println!("rand_rect idx: {}", idx);
+        // println!("rand_rect idx: {}", idx);
         self.rects[idx]
     }
 
@@ -222,7 +220,7 @@ impl BspDungeonBuilder {
                 }
             }
         }
-        println!("Rectangle allowed: {}", can_build);
+        // println!("Rectangle allowed: {}", can_build);
         can_build
     }
 }

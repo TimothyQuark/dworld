@@ -4,17 +4,23 @@ use crate::AppState;
 
 use crate::systems::map::Map;
 
-use crate::components::geometry::Position;
+use crate::components::map::Position;
 
 mod bsp_dungeon;
 use bsp_dungeon::BspDungeonBuilder;
+
+mod empty_room;
+use empty_room::EmptyRoomBuilder;
 
 mod common;
 // use common::apply_room_to_map;
 
 pub fn build_new_map(mut commands: Commands, mut state: ResMut<State<AppState>>) {
     let new_depth = 1;
-    let rng = 1;
+
+    // let mut rng_gen = SmallRng::seed_from_u64(100);
+    // let rng = rng_gen.gen_range(0..1));
+    let rng = 2;
     let mut result: Box<dyn MapBuilder>;
 
     match rng {
@@ -22,9 +28,14 @@ pub fn build_new_map(mut commands: Commands, mut state: ResMut<State<AppState>>)
             result = Box::new(BspDungeonBuilder::new(new_depth));
             result.build_map();
         }
+        2 => {
+            result = Box::new(EmptyRoomBuilder::new(new_depth));
+            result.build_map();
+        }
+        
 
         _ => {
-            panic!("Undefined map builder selected");
+            panic!("Undefined map builder selected: {}", rng);
         }
     }
 

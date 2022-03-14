@@ -46,9 +46,9 @@ impl Map {
 
     /// Converts index in tile vec to XY coordinate
     /// returns (x,y)
-    pub fn idx_xy(&self, idx: u32) -> (u32, u32) {
-        let x = idx % self.width;
-        let y = (idx - x) / self.width;
+    pub fn idx_xy(&self, idx: usize) -> (u32, u32) {
+        let x = idx as u32 % self.width;
+        let y = (idx as u32 - x) / self.width;
         // let y = idx / self.width;
 
         (x, y)

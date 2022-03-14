@@ -1,14 +1,14 @@
 use bevy::prelude::*;
 
-use rand::prelude::*;
+// use rand::prelude::*;
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 
 use super::{
     common::{apply_room_to_map, draw_corridor},
-    Map, MapBuilder, Position,
+    Map, MapBuilder,
 };
-use crate::components::map::MapTileType;
+use crate::components::map::{MapTileType, Position};
 use crate::geometry::Rect;
 // use crate::{components::map::TileType, SCREEN_HEIGHT, SCREEN_WIDTH, TILESIZE};
 
@@ -44,7 +44,7 @@ impl MapBuilder for BspDungeonBuilder {
 }
 
 impl BspDungeonBuilder {
-    pub fn new(new_depth: i32) -> BspDungeonBuilder {
+    pub fn new(new_depth: i32) -> Self {
         println!("New BspDungeonBuilder created (map needs to be built)");
         BspDungeonBuilder {
             // TODO: Decouple map size from screen dimensions

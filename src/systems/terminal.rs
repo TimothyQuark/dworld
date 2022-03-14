@@ -1,6 +1,9 @@
 use bevy::prelude::*;
 
-use crate::components::rendering::{BottomSidebar, RightSidebar, TerminalTile, TopSidebar};
+use crate::components::map::Position;
+use crate::components::rendering::{
+    BottomSidebar, Renderable, RightSidebar, TerminalTile, TopSidebar,
+};
 use crate::systems::map::Map;
 use crate::text::{default_textstyle, DefaultTextStyle};
 
@@ -116,6 +119,21 @@ impl Terminal {
         // let y = idx / self.width;
 
         (x, y)
+    }
+
+    /// Converts map coordinates to terminal coordinates. Note that this max return
+    /// terminal coordinates that are out of range
+    /// 
+    /// Returns: (term_x_idx, term_y_idx)
+    fn map_coord_to_term_coord (&self, map_x_idx: u32, map_y_idx : u32) -> (u32, u32) {
+        // let (map_x_idx, map_y_idx) = map.idx_xy(map_idx);
+    
+        // Shift map_y_idx up so it is not covered by the game log. Nothing need to
+        // be done with map_x_idx for now.
+        let term_y_idx = map_y_idx + self.bottom_sidebar_height;
+        let term_x_idx = map_x_idx;
+
+        (term_x_idx, term_y_idx)
     }
 }
 
@@ -269,16 +287,14 @@ pub fn render_terminal(
     // mut commands: Commands,
     map: Res<Map>,
     mut terminal: ResMut<Terminal>,
+    mut r_query: Query<(&Renderable, &Position), With<Renderable>>,
     // QuerySet limited to 4 QueryState
     mut q: QuerySet<(
         QueryState<(&mut Transform, &mut TextureAtlasSprite, &TerminalTile), With<TerminalTile>>,
         QueryState<&mut Text, With<TopSidebar>>,
         QueryState<&mut Text, With<RightSidebar>>,
         QueryState<&mut Text, With<BottomSidebar>>,
-    )>, // mut query: Query<(&mut Transform, &mut TextureAtlasSprite, &TerminalTile), With<TerminalTile>>,
-        // mut t_sidebar_query: Query<&mut Text, With<TopSidebar>>,
-        // mut b_sidebar_query: Query<&mut Text, With<BottomSidebar>>,
-        // mut r_sidebar_query: Query<&mut Text, With<RightSidebar>>
+    )>,
 ) {
     // Update text of the top sidebar
     // let mut top_sidebar = q.q1().single_mut();
@@ -297,16 +313,17 @@ pub fn render_terminal(
         line.value = terminal.bottom_sidebar_text[idx].clone();
     }
 
-    // Draw the map using the remaining tiles
+    // Update the tiles that draw the map
 
     for (map_idx, map_tile) in map.tiles.clone().into_iter().enumerate() {
-        let (map_x_idx, map_y_idx) = map.idx_xy(map_idx as u32);
-        // let (terminal_width, terminal_height) = terminal.get_terminal_dim();
+        // let (map_x_idx, map_y_idx) = map.idx_xy(map_idx as u32);
 
-        // Shift map_y_idx up so it is not covered by the game log. Nothing need to
-        // be done with map_x_idx for now.
-        let term_y_idx = map_y_idx + terminal.bottom_sidebar_height;
-        let term_x_idx = map_x_idx;
+        // // Shift map_y_idx up so it is not covered by the game log. Nothing need to
+        // // be done with map_x_idx for now.
+        // let term_y_idx = map_y_idx + terminal.bottom_sidebar_height;
+        // let term_x_idx = map_x_idx;
+        let (map_x_idx, map_y_idx) = map.idx_xy(map_idx);
+        let (term_x_idx, term_y_idx) = terminal.map_coord_to_term_coord(map_x_idx, map_y_idx);
 
         if term_x_idx < (terminal.terminal_width - terminal.right_sidebar_width)
             && term_y_idx < terminal.terminal_height - terminal.top_sidebar_height
@@ -320,11 +337,30 @@ pub fn render_terminal(
         }
     }
 
-    // Update the glyphs and colors of the terminal tiles
+    // Update the tiles that draw Renderable entities. Note that this replaces
+    // what was drawn by the map.
+
+    for (renderable, position) in r_query.iter() {
+        // println!("Found a renderable!");
+
+        let (term_x_idx, term_y_idx) = terminal.map_coord_to_term_coord(position.x as u32, position.y as u32);
+        let terminal_idx = terminal.xy_idx(term_x_idx, term_y_idx);
+        terminal.terminal_tiles[terminal_idx].0 = char_to_spriteidx(renderable.glyph);
+        terminal.terminal_tiles[terminal_idx].1 = renderable.fg;
+    }
+
+    // Render the glyphs and colors of the terminal tiles
     // let query_iter = q.q0().iter_mut();
     for tile in q.q0().iter_mut() {
         let (_, mut sprite, tile_component) = tile;
         sprite.index = terminal.terminal_tiles[tile_component.idx].0;
         sprite.color = terminal.terminal_tiles[tile_component.idx].1;
+    }
+}
+
+pub fn char_to_spriteidx (glyph: char) -> usize {
+    match glyph {
+        '@' => 64,
+        _ => panic!("Spriteindex not defined for this char: {}", glyph)
     }
 }

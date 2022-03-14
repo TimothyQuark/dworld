@@ -8,7 +8,7 @@ pub struct Map {
     pub tiles: Vec<MapTileType>,
     pub width: u32,
     pub height: u32,
-    pub blocked: Vec<bool>
+    pub blocked: Vec<bool>,
 }
 
 impl Default for Map {
@@ -23,7 +23,7 @@ impl Default for Map {
             tiles: vec![MapTileType::DownStairs; (width * height) as usize],
             width,
             height,
-            blocked: vec![true; (width * height) as usize]
+            blocked: vec![true; (width * height) as usize],
         }
     }
 }
@@ -35,7 +35,7 @@ impl Map {
             tiles: vec![MapTileType::Wall; (width * height) as usize],
             width,
             height,
-            blocked: vec![true; (width * height) as usize]
+            blocked: vec![true; (width * height) as usize],
         };
         println!("New Map created (still need to add as a resource)");
 

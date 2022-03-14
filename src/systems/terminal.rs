@@ -363,6 +363,7 @@ pub fn render_terminal(
 pub fn char_to_spriteidx(glyph: char) -> usize {
     match glyph {
         '@' => 64,
+        '!' => 33,
         _ => panic!("Spriteindex not defined for this char: {}", glyph),
     }
 }

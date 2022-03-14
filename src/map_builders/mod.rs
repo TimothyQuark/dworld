@@ -1,3 +1,4 @@
+use bevy::ecs::system::Command;
 use bevy::prelude::*;
 
 use crate::AppState;
@@ -15,6 +16,7 @@ use empty_room::EmptyRoomBuilder;
 mod common;
 // use common::apply_room_to_map;
 
+// This is a system, but important enough to have in its own folder
 pub fn build_new_map(
     mut commands: Commands,
     mut state: ResMut<State<AppState>>,
@@ -52,6 +54,9 @@ pub fn build_new_map(
     let player_pos = result.get_starting_position();
     query.single_mut().x = player_pos.x;
     query.single_mut().y = player_pos.y;
+
+    // Spawn entities on the map
+    result.spawn_entities(commands);
 
     // Change Game State to awaiting input
     state.set(AppState::AwaitingInput).unwrap();
@@ -94,7 +99,7 @@ pub fn build_new_map(
 
 pub trait MapBuilder {
     fn build_map(&mut self);
-    fn spawn_entities(&mut self, ecs: &mut World);
+    fn spawn_entities(&mut self, commands: Commands);
     fn get_map(&self) -> Map;
     fn get_starting_position(&self) -> Position;
     // fn get_snapshot_history(&self) -> Vec<Map>;

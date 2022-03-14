@@ -29,7 +29,7 @@ impl MapBuilder for EmptyRoomBuilder {
         self.build();
     }
 
-    fn spawn_entities(&mut self, ecs: &mut World) {}
+    fn spawn_entities(&mut self, commands: Commands) {}
 
     // fn spawn_entities(&mut self, ecs : &mut World) {
     //     for room in self.rooms.iter().skip(1) {

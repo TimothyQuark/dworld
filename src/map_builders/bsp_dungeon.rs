@@ -8,7 +8,10 @@ use super::{
     common::{apply_room_to_map, draw_corridor},
     Map, MapBuilder,
 };
-use crate::components::map::{MapTileType, Position};
+use crate::components::{
+    map::{MapTileType, Position},
+    rendering::Renderable,
+};
 use crate::geometry::Rect;
 // use crate::{components::map::TileType, SCREEN_HEIGHT, SCREEN_WIDTH, TILESIZE};
 
@@ -34,7 +37,23 @@ impl MapBuilder for BspDungeonBuilder {
         self.build();
     }
 
-    fn spawn_entities(&mut self, ecs: &mut World) {}
+    // Don't spawn anything in the first room (room with Player in it)
+    fn spawn_entities(&mut self, mut commands: Commands) {
+        for room in self.rooms.iter().skip(1) {
+            let (x, y) = room.center();
+
+            println!("Found a room to spawn a monster in!");
+            commands
+                .spawn()
+                .insert(Renderable {
+                    glyph: '!',
+                    fg: Color::RED,
+                    bg: Color::BLACK,
+                    render_order: 2,
+                })
+                .insert(Position { x, y });
+        }
+    }
 
     // fn spawn_entities(&mut self, ecs : &mut World) {
     //     for room in self.rooms.iter().skip(1) {

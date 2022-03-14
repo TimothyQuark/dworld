@@ -18,9 +18,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
-            artifact_name: dworld
-            asset_name: dworld-linux
+          # - os: ubuntu-latest
+          #   artifact_name: dworld
+          #   asset_name: dworld-linux
           - os: windows-latest
             artifact_name: dworld.exe
             asset_name: dworld-windows.exe
@@ -41,9 +41,9 @@ jobs:
       with:
         toolchain: stable
         override: true
-    - name: Install alsa and udev
-      run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
-      if: runner.os == 'linux'  
+    # - name: Install alsa and udev
+    #   run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
+    #   if: runner.os == 'linux'  
     - name: Build
       run: cargo build --verbose
     - name: Test

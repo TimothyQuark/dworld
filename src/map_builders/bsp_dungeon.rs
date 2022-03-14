@@ -124,15 +124,6 @@ impl BspDungeonBuilder {
             y: start.1,
         };
 
-        // Random code to try and see if this works
-        // for x in 1..self.map.width - 1 {
-        //     for y in 1..self.map.height - 1 {
-        //         let idx = self.map.xy_idx(x, y) as usize;
-        //         self.map.tiles[idx] = MapTileType::Floor;
-        //     }
-        // }
-        // self.map.tiles[15] = MapTileType::Wall;
-
         println!("BspDungeonBuilder has built a dungeon");
     }
 

@@ -4,7 +4,7 @@ use crate::AppState;
 
 use crate::systems::map::Map;
 
-use crate::components::map::Position;
+use crate::components::{map::Position, player::Player};
 
 mod bsp_dungeon;
 use bsp_dungeon::BspDungeonBuilder;
@@ -15,35 +15,46 @@ use empty_room::EmptyRoomBuilder;
 mod common;
 // use common::apply_room_to_map;
 
-pub fn build_new_map(mut commands: Commands, mut state: ResMut<State<AppState>>) {
+pub fn build_new_map(
+    mut commands: Commands,
+    mut state: ResMut<State<AppState>>,
+    mut query: Query<&mut Position, With<Player>>,
+) {
     let new_depth = 1;
 
     // let mut rng_gen = SmallRng::seed_from_u64(100);
     // let rng = rng_gen.gen_range(0..1));
-    let rng = 2;
+    let rng = 1;
     let mut result: Box<dyn MapBuilder>;
 
     match rng {
+        // 0 so rng will never select this builder
+        0 => {
+            result = Box::new(EmptyRoomBuilder::new(new_depth));
+            result.build_map();
+        }
         1 => {
             result = Box::new(BspDungeonBuilder::new(new_depth));
             result.build_map();
         }
-        2 => {
-            result = Box::new(EmptyRoomBuilder::new(new_depth));
-            result.build_map();
-        }
-        
 
         _ => {
             panic!("Undefined map builder selected: {}", rng);
         }
     }
 
-    let new_map = result.get_map();
-
     // This will rewrite the previous map resource
+    let new_map = result.get_map();
     commands.insert_resource(new_map);
-    state.set(AppState::InGame).unwrap();
+
+    // Move the player to starting position
+    let player_pos = result.get_starting_position();
+    query.single_mut().x = player_pos.x;
+    query.single_mut().y = player_pos.y;
+
+    // Change Game State to awaiting input
+    state.set(AppState::AwaitingInput).unwrap();
+
     println!("New map created and inserted as a resource");
 }
 

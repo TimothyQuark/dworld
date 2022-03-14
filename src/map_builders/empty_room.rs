@@ -1,10 +1,10 @@
 use bevy::prelude::*;
 
-use crate::components::map::{MapTileType, Position};
 use super::{
     common::{apply_room_to_map, draw_corridor},
     Map, MapBuilder,
 };
+use crate::components::map::{MapTileType, Position};
 use crate::geometry::Rect;
 
 pub struct EmptyRoomBuilder {
@@ -38,8 +38,7 @@ impl MapBuilder for EmptyRoomBuilder {
     // }
 }
 
-impl EmptyRoomBuilder { 
-
+impl EmptyRoomBuilder {
     pub fn new(new_depth: i32) -> Self {
         println!("New EmptyRoomBuilder created (map needs to be built)");
         EmptyRoomBuilder {
@@ -54,7 +53,6 @@ impl EmptyRoomBuilder {
     }
 
     fn build(&mut self) {
-
         self.rects.clear();
         self.rects.push(Rect::new(
             1,

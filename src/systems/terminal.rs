@@ -123,11 +123,11 @@ impl Terminal {
 
     /// Converts map coordinates to terminal coordinates. Note that this max return
     /// terminal coordinates that are out of range
-    /// 
+    ///
     /// Returns: (term_x_idx, term_y_idx)
-    fn map_coord_to_term_coord (&self, map_x_idx: u32, map_y_idx : u32) -> (u32, u32) {
+    fn map_coord_to_term_coord(&self, map_x_idx: u32, map_y_idx: u32) -> (u32, u32) {
         // let (map_x_idx, map_y_idx) = map.idx_xy(map_idx);
-    
+
         // Shift map_y_idx up so it is not covered by the game log. Nothing need to
         // be done with map_x_idx for now.
         let term_y_idx = map_y_idx + self.bottom_sidebar_height;
@@ -314,7 +314,6 @@ pub fn render_terminal(
     }
 
     // Update the tiles that draw the map
-
     for (map_idx, map_tile) in map.tiles.clone().into_iter().enumerate() {
         // let (map_x_idx, map_y_idx) = map.idx_xy(map_idx as u32);
 
@@ -334,16 +333,19 @@ pub fn render_terminal(
             // Convert map_idx to terminal_idx
             let terminal_idx = terminal.xy_idx(term_x_idx, term_y_idx);
             terminal.terminal_tiles[terminal_idx].0 = Map::maptiletype_to_spriteidx(map_tile);
+            // TODO: Change map tile color based on environment
+            // Default map tile color is blue
+            terminal.terminal_tiles[terminal_idx].1 = Color::BLUE;
         }
     }
 
     // Update the tiles that draw Renderable entities. Note that this replaces
     // what was drawn by the map.
-
     for (renderable, position) in r_query.iter() {
         // println!("Found a renderable!");
 
-        let (term_x_idx, term_y_idx) = terminal.map_coord_to_term_coord(position.x as u32, position.y as u32);
+        let (term_x_idx, term_y_idx) =
+            terminal.map_coord_to_term_coord(position.x as u32, position.y as u32);
         let terminal_idx = terminal.xy_idx(term_x_idx, term_y_idx);
         terminal.terminal_tiles[terminal_idx].0 = char_to_spriteidx(renderable.glyph);
         terminal.terminal_tiles[terminal_idx].1 = renderable.fg;
@@ -358,9 +360,9 @@ pub fn render_terminal(
     }
 }
 
-pub fn char_to_spriteidx (glyph: char) -> usize {
+pub fn char_to_spriteidx(glyph: char) -> usize {
     match glyph {
         '@' => 64,
-        _ => panic!("Spriteindex not defined for this char: {}", glyph)
+        _ => panic!("Spriteindex not defined for this char: {}", glyph),
     }
 }

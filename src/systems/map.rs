@@ -8,20 +8,22 @@ pub struct Map {
     pub tiles: Vec<MapTileType>,
     pub width: u32,
     pub height: u32,
+    pub blocked: Vec<bool>
 }
 
 impl Default for Map {
-    /// Create a 200 by 100 tile map of walls
+    /// Create a tile map of walls
     fn default() -> Self {
         println!("Default map initialized (still need to add as a resource)");
         let width: u32 = 40;
         let height: u32 = 24;
 
-        // Downstairs used so it is obvious this should not be used
+        // Downstairs tiles so it is obvious this should not be used
         Self {
             tiles: vec![MapTileType::DownStairs; (width * height) as usize],
             width,
             height,
+            blocked: vec![true; (width * height) as usize]
         }
     }
 }
@@ -33,6 +35,7 @@ impl Map {
             tiles: vec![MapTileType::Wall; (width * height) as usize],
             width,
             height,
+            blocked: vec![true; (width * height) as usize]
         };
         println!("New Map created (still need to add as a resource)");
 
@@ -60,6 +63,12 @@ impl Map {
             MapTileType::Floor => 46,
             MapTileType::DownStairs => 25,
             MapTileType::UpStairs => 24,
+        }
+    }
+
+    pub fn populate_blocked(&mut self) {
+        for (i, tile) in self.tiles.iter_mut().enumerate() {
+            self.blocked[i] = *tile == MapTileType::Wall;
         }
     }
 }

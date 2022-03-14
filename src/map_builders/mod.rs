@@ -44,7 +44,8 @@ pub fn build_new_map(
     }
 
     // This will rewrite the previous map resource
-    let new_map = result.get_map();
+    let mut new_map = result.get_map();
+    new_map.populate_blocked();
     commands.insert_resource(new_map);
 
     // Move the player to starting position

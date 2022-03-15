@@ -19,6 +19,9 @@ pub struct Map {
     pub height: u32,
     pub revealed_tiles: Vec<bool>,
     pub blocked_tiles: Vec<bool>,
+
+    // Each tile has a vec of entities that are ontop of it
+    pub tile_content: Vec<Vec<Entity>>,
 }
 
 impl Default for Map {
@@ -35,6 +38,7 @@ impl Default for Map {
             height,
             revealed_tiles: vec![true; (width * height) as usize],
             blocked_tiles: vec![true; (width * height) as usize],
+            tile_content: vec![Vec::new(); (width * height) as usize],
         }
     }
 }
@@ -48,6 +52,7 @@ impl Map {
             height,
             revealed_tiles: vec![true; (width * height) as usize],
             blocked_tiles: vec![true; (width * height) as usize],
+            tile_content: vec![Vec::new(); (width * height) as usize],
         };
         println!("New Map created (still need to add as a resource)");
 
@@ -69,9 +74,19 @@ impl Map {
         (x, y)
     }
 
+    /// Iterate through all map tiles, and determine if the terrain is blocking
+    /// (Ignores entities on top of the map tile)
     pub fn populate_blocked(&mut self) {
         for (i, tile) in self.tiles.iter_mut().enumerate() {
             self.blocked_tiles[i] = *tile == MapTileType::Wall;
+        }
+    }
+
+    /// Clear the tile_content list, which holds references to which entities
+    /// are on top of every map tile
+    pub fn clear_content_index(&mut self) {
+        for content in self.tile_content.iter_mut() {
+            content.clear();
         }
     }
 }
@@ -83,12 +98,15 @@ pub fn init_map(mut commands: Commands) {
     commands.insert_resource(map);
 }
 
+/// Check if a map tile is a wall and is revealed (useful for rendering)
 fn is_revealed_and_wall(map: &Map, x: i32, y: i32) -> bool {
     let idx = map.xy_idx(x, y);
     // println!("x: {}, y: {}, idx: {}", x, y, idx);
     map.tiles[idx] == MapTileType::Wall && map.revealed_tiles[idx]
 }
 
+/// Determines the correct wall glyph to be used for a wall tile,
+/// based on how many neighboring wall tiles it has
 pub fn wall_glyph(map: &Map, x: i32, y: i32) -> u8 {
     // Walls on edge of map will default to basic wall, because their neighbors
     // are out of bounds of map_tiles vec
@@ -133,6 +151,7 @@ pub fn wall_glyph(map: &Map, x: i32, y: i32) -> u8 {
     }
 }
 
+/// Convert a map tile to cp437 code
 pub fn maptile_to_cp437(tile: MapTileType) -> usize {
     match tile {
         MapTileType::Wall => char_to_cp437('#'),

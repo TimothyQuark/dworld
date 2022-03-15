@@ -15,6 +15,7 @@ use systems::{
     map::init_map,
     player::init_player,
     terminal::{init_terminal, render_terminal, Terminal},
+    update_blockers::map_indexing,
     // utilities::print_resources
 };
 
@@ -63,5 +64,6 @@ fn main() {
         .add_system_set(SystemSet::on_enter(AppState::NewGame).with_system(build_new_map))
         .add_system(render_terminal.system())
         .add_system(player_input.system())
+        .add_system(map_indexing.system())
         .run();
 }

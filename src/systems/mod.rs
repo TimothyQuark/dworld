@@ -10,6 +10,8 @@ pub mod camera;
 
 pub mod utilities;
 
+pub mod update_blockers;
+
 // /// Resource that contains the main random number generators
 // pub struct RandomNumberGenerator {
 

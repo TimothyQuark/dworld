@@ -13,7 +13,7 @@ pub fn init_player(mut commands: Commands) {
             glyph: '@',
             fg: Color::WHITE,
             bg: Color::BLACK,
-            render_order: 2,
+            render_order: 0,
         })
         .insert(Position { x: 0, y: 0 })
         .id();

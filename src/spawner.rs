@@ -175,7 +175,7 @@ fn monster<S: ToString>(commands: &mut Commands, x: i32, y: i32, glyph: char, na
             glyph,
             fg: Color::RED,
             bg: Color::BLACK,
-            render_order: 1,
+            render_order: 2,
         })
         .insert(Monster {})
         .insert(Name {
@@ -210,7 +210,7 @@ fn health_potion(commands: &mut Commands, x: i32, y: i32) {
             glyph: '¡',
             fg: Color::YELLOW,
             bg: Color::BLACK,
-            render_order: 2,
+            render_order: 1,
         })
         .insert(Name {
             name: "Health Potion".to_string(),

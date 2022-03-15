@@ -362,7 +362,11 @@ pub fn render_terminal(
 
     // Update the tiles that draw Renderable entities. Note that this replaces
     // what was drawn by the map.
-    for (renderable, position) in r_query.iter() {
+    // Sort Renderable entities by their render_order. The lower the render_order,
+    // the higher the priority. Thus, Player should have priority 0.
+    let mut data = r_query.iter().collect::<Vec<_>>();
+    data.sort_by(|&a, &b| b.0.render_order.cmp(&a.0.render_order));
+    for (renderable, position) in data.iter() {
         // println!("Found a renderable!");
 
         let (term_x_idx, term_y_idx) =

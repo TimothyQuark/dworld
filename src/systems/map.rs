@@ -67,15 +67,13 @@ impl Map {
         // let y = idx / self.width;
 
         (x, y)
-    }    
+    }
 
     pub fn populate_blocked(&mut self) {
         for (i, tile) in self.tiles.iter_mut().enumerate() {
             self.blocked_tiles[i] = *tile == MapTileType::Wall;
         }
     }
-
-    
 }
 
 /// System that initializes a default map on app start
@@ -85,7 +83,7 @@ pub fn init_map(mut commands: Commands) {
     commands.insert_resource(map);
 }
 
-fn is_revealed_and_wall(map: &Map, x: i32, y: i32) -> bool {    
+fn is_revealed_and_wall(map: &Map, x: i32, y: i32) -> bool {
     let idx = map.xy_idx(x, y);
     // println!("x: {}, y: {}, idx: {}", x, y, idx);
     map.tiles[idx] == MapTileType::Wall && map.revealed_tiles[idx]
@@ -94,34 +92,44 @@ fn is_revealed_and_wall(map: &Map, x: i32, y: i32) -> bool {
 pub fn wall_glyph(map: &Map, x: i32, y: i32) -> u8 {
     // Walls on edge of map will default to basic wall, because their neighbors
     // are out of bounds of map_tiles vec
-    if x < 1 || x > map.width as i32 - 2 || y < 1 || y > map.height as i32 -2 { return 35 }
+    if x < 1 || x > map.width as i32 - 2 || y < 1 || y > map.height as i32 - 2 {
+        return 35;
+    }
 
-    let mut mask : u8 = 0;
+    let mut mask: u8 = 0;
 
-    if is_revealed_and_wall(map, x, y - 1) { mask +=1; }
-    if is_revealed_and_wall(map, x, y + 1) { mask +=2; }
-    if is_revealed_and_wall(map, x - 1, y) { mask +=4; }
-    if is_revealed_and_wall(map, x + 1, y) { mask +=8; }
+    if is_revealed_and_wall(map, x, y - 1) {
+        mask += 1;
+    }
+    if is_revealed_and_wall(map, x, y + 1) {
+        mask += 2;
+    }
+    if is_revealed_and_wall(map, x - 1, y) {
+        mask += 4;
+    }
+    if is_revealed_and_wall(map, x + 1, y) {
+        mask += 8;
+    }
 
     // The code from bracket tutorial has errors in the code, have fixed them
     match mask {
-        0 => { 9 } // Pillar because we can't see neighbors
-        1 => { 186 } // Wall only to the north
-        2 => { 186 } // Wall only to the south
-        3 => { 186 } // Wall to the north and south
-        4 => { 205 } // Wall only to the west
-        5 => { 187 } // Wall to the north and west
-        6 => { 188 } // Wall to the south and west
-        7 => { 185 } // Wall to the north, south and west
-        8 => { 205 } // Wall only to the east
-        9 => { 201 } // Wall to the north and east
-        10 => { 200 } // Wall to the south and east
-        11 => { 204 } // Wall to the north, south and east
-        12 => { 205 } // Wall to the east and west
-        13 => { 203 } // Wall to the east, west, and south
-        14 => { 202 } // Wall to the east, west, and north
-        15 => { 206 }  // ╬ Wall on all sides
-        _ => { 0 } // We missed one?
+        0 => 9,    // Pillar because we can't see neighbors
+        1 => 186,  // Wall only to the north
+        2 => 186,  // Wall only to the south
+        3 => 186,  // Wall to the north and south
+        4 => 205,  // Wall only to the west
+        5 => 187,  // Wall to the north and west
+        6 => 188,  // Wall to the south and west
+        7 => 185,  // Wall to the north, south and west
+        8 => 205,  // Wall only to the east
+        9 => 201,  // Wall to the north and east
+        10 => 200, // Wall to the south and east
+        11 => 204, // Wall to the north, south and east
+        12 => 205, // Wall to the east and west
+        13 => 203, // Wall to the east, west, and south
+        14 => 202, // Wall to the east, west, and north
+        15 => 206, // ╬ Wall on all sides
+        _ => 0,    // We missed one?
     }
 }
 

@@ -141,7 +141,7 @@ fn spawn_entity(commands: &mut Commands, spawn: &(&usize, &String), map: &Map) {
         }
     }
 
-    println!("Spawned a {}", spawn.1);
+    // println!("Spawned a {}", spawn.1);
 }
 
 fn orc(commands: &mut Commands, x: i32, y: i32) {

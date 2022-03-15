@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::components::{map::Position, player::Player};
+use crate::components::{living::Player, map::Position};
 use crate::systems::map::Map;
 
 pub fn player_input(

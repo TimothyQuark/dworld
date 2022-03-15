@@ -1,19 +1,16 @@
 use bevy::prelude::*;
 
-// use rand::prelude::*;
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 
 use super::{
     common::{apply_room_to_map, draw_corridor},
-    Map, MapBuilder,
+    MapBuilder,
 };
-use crate::components::{
-    map::{MapTileType, Position},
-    rendering::Renderable,
-};
+use crate::components::{map::Position, rendering::Renderable};
 use crate::geometry::Rect;
-// use crate::{components::map::TileType, SCREEN_HEIGHT, SCREEN_WIDTH, TILESIZE};
+use crate::spawner::spawn_room;
+use crate::systems::map::{Map, MapTileType};
 
 pub struct BspDungeonBuilder {
     map: Map,
@@ -38,28 +35,24 @@ impl MapBuilder for BspDungeonBuilder {
     }
 
     // Don't spawn anything in the first room (room with Player in it)
-    fn spawn_entities(&mut self, mut commands: Commands) {
+    fn spawn_entities(&mut self, commands: &mut Commands) {
         for room in self.rooms.iter().skip(1) {
-            let (x, y) = room.center();
+            //     let (x, y) = room.center();
+            //     // println!("Found a room to spawn a monster in!");
+            //     commands
+            //         .spawn()
+            //         .insert(Renderable {
+            //             glyph: '!',
+            //             fg: Color::RED,
+            //             bg: Color::BLACK,
+            //             render_order: 2,
+            //         })
+            //         .insert(Position { x, y });
+            // }
 
-            println!("Found a room to spawn a monster in!");
-            commands
-                .spawn()
-                .insert(Renderable {
-                    glyph: '!',
-                    fg: Color::RED,
-                    bg: Color::BLACK,
-                    render_order: 2,
-                })
-                .insert(Position { x, y });
+            spawn_room(commands, room, &self.map, self.depth);
         }
     }
-
-    // fn spawn_entities(&mut self, ecs : &mut World) {
-    //     for room in self.rooms.iter().skip(1) {
-    //         spawner::spawn_room(ecs, room, self.depth);
-    //     }
-    // }
 }
 
 impl BspDungeonBuilder {

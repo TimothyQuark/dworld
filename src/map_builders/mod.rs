@@ -5,7 +5,7 @@ use crate::AppState;
 
 use crate::systems::map::Map;
 
-use crate::components::{map::Position, player::Player};
+use crate::components::{living::Player, map::Position};
 
 mod bsp_dungeon;
 use bsp_dungeon::BspDungeonBuilder;
@@ -56,7 +56,7 @@ pub fn build_new_map(
     query.single_mut().y = player_pos.y;
 
     // Spawn entities on the map
-    result.spawn_entities(commands);
+    result.spawn_entities(&mut commands);
 
     // Change Game State to awaiting input
     state.set(AppState::AwaitingInput).unwrap();
@@ -99,7 +99,7 @@ pub fn build_new_map(
 
 pub trait MapBuilder {
     fn build_map(&mut self);
-    fn spawn_entities(&mut self, commands: Commands);
+    fn spawn_entities(&mut self, commands: &mut Commands);
     fn get_map(&self) -> Map;
     fn get_starting_position(&self) -> Position;
     // fn get_snapshot_history(&self) -> Vec<Map>;

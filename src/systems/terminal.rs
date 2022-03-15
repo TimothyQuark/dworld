@@ -347,7 +347,7 @@ pub fn render_terminal(
         let (term_x_idx, term_y_idx) =
             terminal.map_coord_to_term_coord(position.x as u32, position.y as u32);
         let terminal_idx = terminal.xy_idx(term_x_idx, term_y_idx);
-        terminal.terminal_tiles[terminal_idx].0 = char_to_spriteidx(renderable.glyph);
+        terminal.terminal_tiles[terminal_idx].0 = char_to_cp437(renderable.glyph);
         terminal.terminal_tiles[terminal_idx].1 = renderable.fg;
     }
 
@@ -360,10 +360,13 @@ pub fn render_terminal(
     }
 }
 
-pub fn char_to_spriteidx(glyph: char) -> usize {
+pub fn char_to_cp437(glyph: char) -> usize {
     match glyph {
         '@' => 64,
         '!' => 33,
+        '¡' => 173,
+        'o' => 111,
+        'g' => 103,
         _ => panic!("Spriteindex not defined for this char: {}", glyph),
     }
 }

@@ -6,11 +6,7 @@ pub struct Position {
     pub y: i32,
 }
 
-/// Component that describes the kind of tile on a Map
-#[derive(PartialEq, Copy, Clone)]
-pub enum MapTileType {
-    Wall,
-    Floor,
-    DownStairs,
-    UpStairs,
-}
+/// Component that states an entity is a blocker. Note that this is not used
+/// for map tiles, which are not entities (Map is a resource)
+#[derive(Component)]
+pub struct BlockTile {}

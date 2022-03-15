@@ -4,8 +4,9 @@ use super::{
     common::{apply_room_to_map, draw_corridor},
     Map, MapBuilder,
 };
-use crate::components::map::{MapTileType, Position};
+use crate::components::map::Position;
 use crate::geometry::Rect;
+use crate::systems::map::MapTileType;
 
 pub struct EmptyRoomBuilder {
     map: Map,
@@ -29,7 +30,7 @@ impl MapBuilder for EmptyRoomBuilder {
         self.build();
     }
 
-    fn spawn_entities(&mut self, commands: Commands) {}
+    fn spawn_entities(&mut self, commands: &mut Commands) {}
 
     // fn spawn_entities(&mut self, ecs : &mut World) {
     //     for room in self.rooms.iter().skip(1) {

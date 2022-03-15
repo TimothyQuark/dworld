@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::components::{map::Position, player::Player, rendering::Renderable};
+use crate::components::{living::Player, map::Position, rendering::Renderable};
 
 /// Spawn the player entity
 pub fn init_player(mut commands: Commands) {

@@ -15,12 +15,10 @@ use systems::{
     map::init_map,
     player::init_player,
     terminal::{init_terminal, render_terminal, Terminal},
+    // utilities::print_resources
 };
 
 mod text;
-
-mod utilities;
-// pub use utilities::*;
 
 mod geometry;
 

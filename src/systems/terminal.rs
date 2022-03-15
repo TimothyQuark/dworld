@@ -5,6 +5,7 @@ use crate::components::rendering::{
     BottomSidebar, Renderable, RightSidebar, TerminalTile, TopSidebar,
 };
 use crate::systems::map::Map;
+use crate::text::char_to_cp437;
 use crate::text::{default_textstyle, DefaultTextStyle};
 
 // Layer order for different entities. Tiles at the back, text at the front
@@ -332,7 +333,7 @@ pub fn render_terminal(
 
             // Convert map_idx to terminal_idx
             let terminal_idx = terminal.xy_idx(term_x_idx, term_y_idx);
-            terminal.terminal_tiles[terminal_idx].0 = Map::maptiletype_to_spriteidx(map_tile);
+            terminal.terminal_tiles[terminal_idx].0 = Map::maptile_to_cp437(map_tile);
             // TODO: Change map tile color based on environment
             // Default map tile color is blue
             terminal.terminal_tiles[terminal_idx].1 = Color::BLUE;
@@ -357,16 +358,5 @@ pub fn render_terminal(
         let (_, mut sprite, tile_component) = tile;
         sprite.index = terminal.terminal_tiles[tile_component.idx].0;
         sprite.color = terminal.terminal_tiles[tile_component.idx].1;
-    }
-}
-
-pub fn char_to_cp437(glyph: char) -> usize {
-    match glyph {
-        '@' => 64,
-        '!' => 33,
-        '¡' => 173,
-        'o' => 111,
-        'g' => 103,
-        _ => panic!("Spriteindex not defined for this char: {}", glyph),
     }
 }

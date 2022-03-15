@@ -12,10 +12,8 @@ use crate::components::{
     rendering::Renderable,
 };
 use crate::geometry::Rect;
-use crate::systems::{
-    map::{Map, MapTileType},
-    terminal::char_to_cp437,
-};
+use crate::systems::map::{Map, MapTileType};
+use crate::text::char_to_cp437;
 
 const MAX_MONSTERS: i32 = 4;
 

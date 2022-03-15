@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::components::map::*;
+use crate::text::char_to_cp437;
 
 /// Component that describes the kind of tile on a Map
 #[derive(PartialEq, Copy, Clone)]
@@ -66,12 +66,12 @@ impl Map {
         (x, y)
     }
 
-    pub fn maptiletype_to_spriteidx(tile: MapTileType) -> usize {
+    pub fn maptile_to_cp437(tile: MapTileType) -> usize {
         match tile {
-            MapTileType::Wall => 35,
-            MapTileType::Floor => 46,
-            MapTileType::DownStairs => 25,
-            MapTileType::UpStairs => 24,
+            MapTileType::Wall => char_to_cp437('#'),
+            MapTileType::Floor => char_to_cp437('.'),
+            MapTileType::DownStairs => char_to_cp437('↓'),
+            MapTileType::UpStairs => char_to_cp437('↑'),
         }
     }
 
@@ -87,27 +87,3 @@ pub fn init_map(mut commands: Commands) {
 
     commands.insert_resource(map);
 }
-
-// /// System which transfers map data to the terminal so it can be rendered.
-// /// Does not actually render anything itself, important for choosing
-// /// which tiles to display
-// pub fn render_map(
-//     map: Res<Map>,
-//     mut terminal: ResMut<Terminal>
-// ) {
-
-//     // TODO: Take player position, and render the tiles around them
-
-//     //
-
-//     // for x in 1..render_width {
-//     //     for y in 0..render_width {
-
-//     //     }
-//     // }
-
-//     // terminal.terminal_tiles[0].0 = 1;
-//     // terminal.terminal_tiles[2].0 = 1;
-//     // terminal.terminal_tiles[4].0 = 1;
-
-// }

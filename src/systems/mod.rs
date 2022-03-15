@@ -12,6 +12,8 @@ pub mod utilities;
 
 pub mod update_blockers;
 
+pub mod monster_ai;
+
 // /// Resource that contains the main random number generators
 // pub struct RandomNumberGenerator {
 

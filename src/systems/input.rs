@@ -46,12 +46,12 @@ fn try_move_player(delta_x: i32, delta_y: i32, map: &Map, player_pos: &mut Posit
     }
 
     let destination_idx = map.xy_idx(
-        (player_pos.x + delta_x) as u32,
-        (player_pos.y + delta_y) as u32,
+        player_pos.x + delta_x,
+        player_pos.y + delta_y,
     );
 
     // Check if destination is blocked by a Wall tile
-    if !map.blocked[destination_idx] {
+    if !map.blocked_tiles[destination_idx] {
         player_pos.x = player_pos.x + delta_x;
         player_pos.y = player_pos.y + delta_y;
     }

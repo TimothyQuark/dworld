@@ -86,7 +86,7 @@ pub fn spawn_room(commands: &mut Commands, room: &Rect, map: &Map, map_depth: i3
 
     for y in room.y1 + 1..room.y2 {
         for x in room.x1 + 1..room.x2 {
-            let idx = map.xy_idx(x as u32, y as u32);
+            let idx = map.xy_idx(x, y);
             if map.tiles[idx] == MapTileType::Floor {
                 possible_targets.push(idx);
             }

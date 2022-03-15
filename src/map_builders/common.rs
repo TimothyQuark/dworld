@@ -5,7 +5,7 @@ use crate::systems::map::MapTileType;
 pub fn apply_room_to_map(map: &mut Map, room: &Rect) {
     for y in room.y1 + 1..=room.y2 {
         for x in room.x1 + 1..=room.x2 {
-            let idx = map.xy_idx(x as u32, y as u32);
+            let idx = map.xy_idx(x, y);
             // println!("idx in apply_room_to_map. x: {}, y: {} idx: {}", x, y, idx);
             if idx > 0 && idx < ((map.width * map.height) - 1) as usize {
                 map.tiles[idx as usize] = MapTileType::Floor;
@@ -38,7 +38,7 @@ pub fn draw_corridor(map: &mut Map, x1: i32, y1: i32, x2: i32, y2: i32) {
             y -= 1;
         }
 
-        let idx = map.xy_idx(x as u32, y as u32);
+        let idx = map.xy_idx(x, y);
         map.tiles[idx as usize] = MapTileType::Floor;
     }
 }

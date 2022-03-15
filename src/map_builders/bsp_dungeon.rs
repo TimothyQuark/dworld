@@ -125,7 +125,7 @@ impl BspDungeonBuilder {
 
         // Don't forget the stairs
         let stairs = self.rooms[self.rooms.len() - 1].center();
-        let stairs_idx = self.map.xy_idx(stairs.0 as u32, stairs.1 as u32);
+        let stairs_idx = self.map.xy_idx(stairs.0, stairs.1);
         self.map.tiles[stairs_idx as usize] = MapTileType::DownStairs;
         // self.take_snapshot();
 
@@ -216,7 +216,7 @@ impl BspDungeonBuilder {
                     can_build = false;
                 }
                 if can_build {
-                    let idx = self.map.xy_idx(x as u32, y as u32);
+                    let idx = self.map.xy_idx(x, y);
                     if self.map.tiles[idx as usize] != MapTileType::Wall {
                         can_build = false;
                     }

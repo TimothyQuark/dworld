@@ -4,7 +4,7 @@ use crate::components::map::Position;
 use crate::components::rendering::{
     BottomSidebar, Renderable, RightSidebar, TerminalTile, TopSidebar,
 };
-use crate::systems::map::Map;
+use crate::systems::map::{Map, wall_glyph, MapTileType};
 use crate::text::char_to_cp437;
 use crate::text::{default_textstyle, DefaultTextStyle};
 
@@ -333,10 +333,29 @@ pub fn render_terminal(
 
             // Convert map_idx to terminal_idx
             let terminal_idx = terminal.xy_idx(term_x_idx, term_y_idx);
-            terminal.terminal_tiles[terminal_idx].0 = Map::maptile_to_cp437(map_tile);
-            // TODO: Change map tile color based on environment
+
+            // Determine the correct glyph to show for the tile
             // Default map tile color is blue
-            terminal.terminal_tiles[terminal_idx].1 = Color::BLUE;
+            match map_tile {
+                // TODO: Change map tile color based on environment
+                // Wall tiles change based on their neighbors                
+                MapTileType::Wall => {
+                    terminal.terminal_tiles[terminal_idx].0 = wall_glyph(&map, map_x_idx as i32, map_y_idx as i32) as usize;
+                    terminal.terminal_tiles[terminal_idx].1 = Color::BLUE;
+                },
+                MapTileType::Floor => {
+                    terminal.terminal_tiles[terminal_idx].0 = char_to_cp437('.');
+                    terminal.terminal_tiles[terminal_idx].1 = Color::BLUE;
+                },
+                MapTileType::DownStairs => {
+                    terminal.terminal_tiles[terminal_idx].0 = char_to_cp437('↓');
+                    terminal.terminal_tiles[terminal_idx].1 = Color::GREEN;
+                },
+                MapTileType::UpStairs => {
+                    terminal.terminal_tiles[terminal_idx].0 = char_to_cp437('↑');
+                    terminal.terminal_tiles[terminal_idx].1 = Color::GREEN;
+                },
+            }
         }
     }
 

@@ -6,6 +6,8 @@ use crate::AppState;
 
 /// System which checks if there was any keyboard/mouse input
 pub fn player_input(
+    mut last_time: Local<f64>,
+    time: Res<Time>,
     keys: Res<Input<KeyCode>>,
     map: Res<Map>,
     mut state: ResMut<State<AppState>>,
@@ -16,7 +18,29 @@ pub fn player_input(
     // TODO: Match statement using current game state, and then use either
     // single key events, or text input for entire sentences (see https://bevy-cheatbook.github.io/input/char.html)
 
-    println!("Awaiting player input");
+    /*
+    Once player input is detected and accepted, we switch to MonsterTurn.
+    MonsterTurn is usually very fast and returns to AwaitingInput, which means
+    player_input system seems to be triggered multiple times in a single frame update.
+    That results in duplicate player inputs being detected (ex: Player moves 5 spaces when arrows
+    key only pressed once.). Hence, player_input has a built in delay, which returns
+    nothing if the time since last player_input run was too recent.
+
+    Tried to solve this by using system run criteria,
+    .add_system_set(SystemSet::on_update(AppState::AwaitingInput).with_run_criteria(FixedTimestep::step(0.5)).with_system(player_input))
+    , but Bevy does not seem to like triggering a system on both a state change and fixed time interval.
+    */
+    // Delay only needs to be very small, 10ms.
+    let delay: f64 = 0.01;
+    let passed_time: f64 = time.seconds_since_startup() - *last_time;
+    if passed_time < delay {
+        // If time interval too short, exit function prematurely
+        return;
+    }
+    // println!("Time passed: {}", passed_time);
+    *last_time = time.seconds_since_startup();
+
+    // println!("Awaiting player input");
 
     // Check diagonal movements before normal movements. Alternatively, check if
     // Shift or control are NOT pressed.
@@ -46,10 +70,10 @@ pub fn player_input(
         try_move_player(1, 0, &map, query.single_mut().as_mut(), &mut state);
     }
 
-    println!("No player input detected");
+    // println!("No player input detected");
 }
 
-/// System which tries to move the player
+/// Function which tries to move the player
 fn try_move_player(
     delta_x: i32,
     delta_y: i32,
@@ -57,9 +81,8 @@ fn try_move_player(
     player_pos: &mut Position,
     state: &mut State<AppState>,
 ) {
-    println!("Trying to move player");
+    // println!("Trying to move player");
 
-    // println!("Trying to move player")
     if player_pos.x + delta_x < 0
         || player_pos.x + delta_x > map.width as i32 - 1
         || player_pos.y + delta_y < 0

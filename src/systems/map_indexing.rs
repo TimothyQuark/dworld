@@ -19,7 +19,7 @@ pub fn map_indexing(
         let idx = map.xy_idx(position.x, position.y);
 
         // If Entity blocks, update blocking list
-        if let Some(blocks) = blocker {
+        if let Some(_) = blocker {
             map.blocked_tiles[idx] = true;
         }
 

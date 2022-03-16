@@ -10,7 +10,7 @@ pub mod camera;
 
 pub mod utilities;
 
-pub mod update_blockers;
+pub mod map_indexing;
 
 pub mod monster_ai;
 

@@ -1,4 +1,5 @@
 // use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
+use bevy::core::FixedTimestep;
 use bevy::input::system::exit_on_esc_system;
 use bevy::prelude::*;
 use bevy::window::WindowMode;
@@ -13,11 +14,11 @@ use systems::{
     camera::init_camera,
     input::player_input,
     map::init_map,
+    map_indexing::map_indexing,
     monster_ai::monster_ai,
     // utilities::print_resources
     player::init_player,
     terminal::{init_terminal, render_terminal, Terminal},
-    update_blockers::map_indexing,
 };
 
 mod text;
@@ -60,18 +61,19 @@ fn main() {
         // .add_plugin(LogDiagnosticsPlugin::default())
         // .add_plugin(FrameTimeDiagnosticsPlugin::default())
         // .add_system(print_resources.system())
-        .add_system(exit_on_esc_system.system())
+        .add_system(exit_on_esc_system)
         //Startup systems
-        .add_startup_system(init_camera.system().label("init_camera"))
-        .add_startup_system(init_terminal.system())
-        .add_startup_system(init_map.system())
-        .add_startup_system(init_player.system())
+        .add_startup_system(init_camera.label("init_camera"))
+        .add_startup_system(init_terminal)
+        .add_startup_system(init_map)
+        .add_startup_system(init_player)
         .add_system_set(SystemSet::on_enter(AppState::NewGame).with_system(build_new_map))
         // Normal Systems
-        .add_system(render_terminal.system())
-        // .add_system(player_input.system())
-        .add_system_set(SystemSet::on_update(AppState::AwaitingInput).with_system(player_input))
-        .add_system_set(SystemSet::on_update(AppState::MonsterTurn).with_system(monster_ai))
-        .add_system(map_indexing.system())
+        .add_system(render_terminal)
+        .add_system_set(SystemSet::on_enter(AppState::MonsterTurn).with_system(monster_ai))
+        .add_system_set(
+            SystemSet::on_update(AppState::AwaitingInput)
+                .with_system(player_input),
+        )
         .run();
 }

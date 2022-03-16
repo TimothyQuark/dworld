@@ -20,11 +20,10 @@ use systems::{
     terminal::{init_terminal, render_terminal, Terminal},
 };
 
-mod text;
-
 mod geometry;
-
+mod pathfinding;
 mod spawner;
+mod text;
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum AppState {
@@ -42,8 +41,9 @@ fn main() {
 
     // App Builder.
     App::new()
+        // Starting State
         .add_state(AppState::NewGame)
-        // Resource
+        // Resources
         .insert_resource(WindowDescriptor {
             title: "DWorld".to_string(),
             width: screen_width as f32,

@@ -63,7 +63,7 @@ pub fn build_new_map(
     // Change Game State to awaiting input
     state.set(AppState::AwaitingInput).unwrap();
 
-    println!("New map created and inserted as a resource");
+    // println!("New map created and inserted as a resource");
 }
 
 pub trait MapBuilder {

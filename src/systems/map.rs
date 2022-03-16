@@ -27,7 +27,7 @@ pub struct Map {
 impl Default for Map {
     /// Create a tile map of walls
     fn default() -> Self {
-        println!("Default map initialized (still need to add as a resource)");
+        // println!("Default map initialized (still need to add as a resource)");
         let width: u32 = 40;
         let height: u32 = 24;
 
@@ -54,7 +54,7 @@ impl Map {
             blocked_tiles: vec![true; (width * height) as usize],
             tile_content: vec![Vec::new(); (width * height) as usize],
         };
-        println!("New Map created (still need to add as a resource)");
+        // println!("New Map created (still need to add as a resource)");
 
         map
     }

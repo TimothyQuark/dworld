@@ -146,7 +146,8 @@ fn spawn_entity(commands: &mut Commands, spawn: &(&usize, &String), map: &Map) {
 fn orc(commands: &mut Commands, x: i32, y: i32) {
     monster(commands, x, y, 'o', "Orc");
 }
-fn goblin(commands: &mut Commands, x: i32, y: i32) {
+/// Spawn a goblin. Public function because it is often used for testing
+pub fn goblin(commands: &mut Commands, x: i32, y: i32) {
     monster(commands, x, y, 'g', "Goblin");
 }
 

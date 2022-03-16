@@ -37,19 +37,6 @@ impl MapBuilder for BspDungeonBuilder {
     // Don't spawn anything in the first room (room with Player in it)
     fn spawn_entities(&mut self, commands: &mut Commands) {
         for room in self.rooms.iter().skip(1) {
-            //     let (x, y) = room.center();
-            //     // println!("Found a room to spawn a monster in!");
-            //     commands
-            //         .spawn()
-            //         .insert(Renderable {
-            //             glyph: '!',
-            //             fg: Color::RED,
-            //             bg: Color::BLACK,
-            //             render_order: 2,
-            //         })
-            //         .insert(Position { x, y });
-            // }
-
             spawn_room(commands, room, &self.map, self.depth);
         }
     }
@@ -57,7 +44,7 @@ impl MapBuilder for BspDungeonBuilder {
 
 impl BspDungeonBuilder {
     pub fn new(new_depth: i32) -> Self {
-        println!("New BspDungeonBuilder created (map needs to be built)");
+        // println!("New BspDungeonBuilder created (map needs to be built)");
         BspDungeonBuilder {
             // TODO: Decouple map size from screen dimensions
             map: Map::new(40, 24),
@@ -136,7 +123,7 @@ impl BspDungeonBuilder {
             y: start.1,
         };
 
-        println!("BspDungeonBuilder has built a dungeon");
+        // println!("BspDungeonBuilder has built a dungeon");
     }
 
     fn add_subrects(&mut self, rect: Rect) {

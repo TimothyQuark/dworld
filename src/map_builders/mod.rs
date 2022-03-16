@@ -1,10 +1,11 @@
 use bevy::prelude::*;
 
-use crate::AppState;
-
-use crate::systems::map::Map;
+// use rand::rngs::SmallRng;
+// use rand::{Rng, SeedableRng};
 
 use crate::components::{living::Player, map::Position};
+use crate::systems::map::Map;
+use crate::AppState;
 
 mod bsp_dungeon;
 use bsp_dungeon::BspDungeonBuilder;
@@ -24,7 +25,9 @@ pub fn build_new_map(
     let new_depth = 1;
 
     // let mut rng_gen = SmallRng::seed_from_u64(100);
-    // let rng = rng_gen.gen_range(0..1));
+    // let mut rng_gen = SmallRng::from_entropy();
+    // If 0 included, empty room can spawn
+    // let rng = rng_gen.gen_range(0..=1);
     let rng = 1;
     let mut result: Box<dyn MapBuilder>;
 

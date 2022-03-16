@@ -288,7 +288,7 @@ pub fn render_terminal(
     // mut commands: Commands,
     map: Res<Map>,
     mut terminal: ResMut<Terminal>,
-    mut r_query: Query<(&Renderable, &Position), With<Renderable>>,
+    r_query: Query<(&Renderable, &Position), With<Renderable>>,
     // QuerySet limited to 4 QueryState
     mut q: QuerySet<(
         QueryState<(&mut Transform, &mut TextureAtlasSprite, &TerminalTile), With<TerminalTile>>,

@@ -17,6 +17,7 @@ pub fn player_input(
 
     // TODO: Match statement using current game state, and then use either
     // single key events, or text input for entire sentences (see https://bevy-cheatbook.github.io/input/char.html)
+    // TODO: Add fast travel (space + arrow key?). Maybe not directly inside input mod.
 
     /*
     Once player input is detected and accepted, we switch to MonsterTurn.

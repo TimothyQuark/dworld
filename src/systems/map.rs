@@ -152,6 +152,7 @@ pub fn wall_glyph(map: &Map, x: i32, y: i32) -> u8 {
 }
 
 /// Convert a map tile to cp437 code
+#[allow(dead_code)]
 pub fn maptile_to_cp437(tile: MapTileType) -> usize {
     match tile {
         MapTileType::Wall => char_to_cp437('#'),

@@ -304,6 +304,7 @@ pub fn char_to_cp437(glyph: char) -> usize {
     }
 }
 
+#[allow(dead_code)]
 pub fn to_char(c: u8) -> char {
     match c {
         1 => '☺',

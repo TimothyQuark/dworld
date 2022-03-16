@@ -1,5 +1,4 @@
 // use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
-use bevy::core::FixedTimestep;
 use bevy::input::system::exit_on_esc_system;
 use bevy::prelude::*;
 use bevy::window::WindowMode;
@@ -70,10 +69,8 @@ fn main() {
         .add_system_set(SystemSet::on_enter(AppState::NewGame).with_system(build_new_map))
         // Normal Systems
         .add_system(render_terminal)
+        .add_system(map_indexing)
         .add_system_set(SystemSet::on_enter(AppState::MonsterTurn).with_system(monster_ai))
-        .add_system_set(
-            SystemSet::on_update(AppState::AwaitingInput)
-                .with_system(player_input),
-        )
+        .add_system_set(SystemSet::on_update(AppState::AwaitingInput).with_system(player_input))
         .run();
 }

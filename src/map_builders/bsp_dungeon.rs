@@ -7,7 +7,7 @@ use super::{
     common::{apply_room_to_map, draw_corridor},
     MapBuilder,
 };
-use crate::components::{map::Position, rendering::Renderable};
+use crate::components::map::Position;
 use crate::geometry::Rect;
 use crate::spawner::spawn_room;
 use crate::systems::map::{Map, MapTileType};

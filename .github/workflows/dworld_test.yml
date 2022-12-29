@@ -4,7 +4,7 @@ name: Test DWorld
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, basic_monsters ]
   pull_request:
     branches: [ master ]
 
@@ -18,14 +18,14 @@ jobs:
     strategy:
       matrix:
         include:
-          # - os: ubuntu-latest
-          #   artifact_name: dworld
-          #   asset_name: dworld-linux
+          - os: ubuntu-latest
+            artifact_name: dworld
+            asset_name: dworld-linux
           - os: windows-latest
             artifact_name: dworld.exe
             asset_name: dworld-windows.exe
           # There seems to be a bug with MacOS compiling, not sure why
-          # I am getting it. 
+          # I am getting it.
           # https://github.com/SergioBenitez/Rocket/issues/1321
           # https://github.com/rust-lang/cargo/issues/9218
           # TODO: This might be fixed by running nightly toolchain instead of
@@ -41,9 +41,9 @@ jobs:
       with:
         toolchain: stable
         override: true
-    # - name: Install alsa and udev
-    #   run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
-    #   if: runner.os == 'linux'  
+    - name: Install alsa and udev
+      run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
+      if: runner.os == 'linux'
     - name: Build
       run: cargo build --verbose
     - name: Test

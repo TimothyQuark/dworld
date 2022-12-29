@@ -31,7 +31,7 @@ features = [
   "bevy_gltf",
   "png",
   "hdr",
-  "wayland",
+  "x11",
 ]
 
 # [dev-dependencies]

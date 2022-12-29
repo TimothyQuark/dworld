@@ -10,31 +10,35 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  test:
-    name: Test DWorld for ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        include:
-          - os: ubuntu-latest
-            artifact_name: dworld
-            asset_name: dworld-linux
-          - os: windows-latest
-            artifact_name: dworld.exe
-            asset_name: dworld-windows.exe
-          - os: macos-latest
-            artifact_name: dworld_rust
-            asset_name: dworld-macos
+  # test:
+  #   name: Test DWorld for ${{ matrix.os }}
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     matrix:
+  #       include:
+  #         - os: ubuntu-latest
+  #           artifact_name: dworld
+  #           asset_name: dworld-linux
+  #         - os: windows-latest
+  #           artifact_name: dworld.exe
+  #           asset_name: dworld-windows.exe
+  #         - os: macos-latest
+  #           artifact_name: dworld_rust
+  #           asset_name: dworld-macos
 
-    steps:
-    - uses: actions/checkout@v3
-    - name: Build
-      run: cargo build --verbose
-    - name: Test
-      run: cargo test --verbose
+  #   steps:
+  #   - uses: actions/checkout@v3
+  #   - uses: dtolnay/rust-toolchain@stable
+  #   - name: Install alsa and libudev
+  #     run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
+  #     if: runner.os == 'linux'
+  #   - name: Build
+  #     run: cargo build --verbose
+  #   - name: Test
+  #     run: cargo test --verbose
 
   publish:
-    needs: test
+    # needs: test
     name: Publish for ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:

@@ -24,13 +24,6 @@ jobs:
           - os: windows-latest
             artifact_name: dworld.exe
             asset_name: dworld-windows.exe
-          # There seems to be a bug with MacOS compiling, not sure why
-          # I am getting it.
-          # https://github.com/SergioBenitez/Rocket/issues/1321
-          # https://github.com/rust-lang/cargo/issues/9218
-          # TODO: This might be fixed by running nightly toolchain instead of
-          # stable for MacOS, see https://github.com/bevyengine/bevy/blob/main/.github/workflows/ci.yml
-          # for possible way to implement
           - os: macos-latest
             artifact_name: dworld_rust
             asset_name: dworld-macos
@@ -38,15 +31,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: dtolnay/rust-toolchain@stable
-      with:
-        toolchain: stable
-        override: true
     - name: Install alsa and udev
       run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
       if: runner.os == 'linux'
-    # - name: Add iOS targets
-    #   run: rustup target add aarch64-apple-ios x86_64-apple-ios
-    #   if: runner.os == 'macos'
     - name: Build
       run: cargo build --verbose
     - name: Test

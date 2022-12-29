@@ -4,4 +4,6 @@ pub mod gamelog;
 
 pub mod map;
 
-pub mod player;
+pub mod living;
+
+pub mod common;

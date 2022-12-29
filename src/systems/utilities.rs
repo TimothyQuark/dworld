@@ -7,6 +7,7 @@ use bevy::reflect::TypeRegistration;
 
 /// System which prints all resources in the World to the console.
 /// Useful for debugging
+#[allow(dead_code)]
 pub fn print_resources(archetypes: &Archetypes, components: &Components) {
     let mut r: Vec<String> = archetypes
         .resource()

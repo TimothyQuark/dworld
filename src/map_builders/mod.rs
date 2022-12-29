@@ -1,10 +1,11 @@
 use bevy::prelude::*;
 
-use crate::AppState;
+// use rand::rngs::SmallRng;
+// use rand::{Rng, SeedableRng};
 
+use crate::components::{living::Player, map::Position};
 use crate::systems::map::Map;
-
-use crate::components::{map::Position, player::Player};
+use crate::AppState;
 
 mod bsp_dungeon;
 use bsp_dungeon::BspDungeonBuilder;
@@ -15,6 +16,7 @@ use empty_room::EmptyRoomBuilder;
 mod common;
 // use common::apply_room_to_map;
 
+// This is a system, but important enough to have in its own folder
 pub fn build_new_map(
     mut commands: Commands,
     mut state: ResMut<State<AppState>>,
@@ -23,7 +25,9 @@ pub fn build_new_map(
     let new_depth = 1;
 
     // let mut rng_gen = SmallRng::seed_from_u64(100);
-    // let rng = rng_gen.gen_range(0..1));
+    // let mut rng_gen = SmallRng::from_entropy();
+    // If 0 included, empty room can spawn
+    // let rng = rng_gen.gen_range(0..=1);
     let rng = 1;
     let mut result: Box<dyn MapBuilder>;
 
@@ -53,48 +57,18 @@ pub fn build_new_map(
     query.single_mut().x = player_pos.x;
     query.single_mut().y = player_pos.y;
 
+    // Spawn entities on the map
+    result.spawn_entities(&mut commands);
+
     // Change Game State to awaiting input
     state.set(AppState::AwaitingInput).unwrap();
 
-    println!("New map created and inserted as a resource");
+    // println!("New map created and inserted as a resource");
 }
-
-// pub fn random_builder_system(mut commands: Commands, mut state: ResMut<State<AppState>>) {
-//     println!("Generating a new map for depth -1 (TODO)");
-//     let new_depth = 0;
-
-//     let rng = 1;
-//     let mut result: Box<dyn MapBuilder>;
-//     match rng {
-//         1 => {
-//             result = Box::new(BspDungeonBuilder::new(new_depth));
-//             result.build_map();
-//         }
-//         _ => {
-//             panic!("Undefined map builder selected");
-//         }
-//     }
-
-//     // TODO: Get starting position, and also spawn entities
-//     let new_map = result.get_map();
-
-//     // This will rewrite the previous map resource
-//     commands.insert_resource(new_map);
-//     state.set(AppState::InGame).unwrap();
-//     println!("New map created and inserted as a resource");
-// }
-
-// pub fn random_builder(new_depth: i32) -> Box<dyn MapBuilder> {
-//     // let mut rng = rltk::RandomNumberGenerator::new();
-//     let builder = 1;
-//     match builder {
-//         1 => Box::new(BspDungeonBuilder::new(new_depth)),
-//     }
-// }
 
 pub trait MapBuilder {
     fn build_map(&mut self);
-    fn spawn_entities(&mut self, ecs: &mut World);
+    fn spawn_entities(&mut self, commands: &mut Commands);
     fn get_map(&self) -> Map;
     fn get_starting_position(&self) -> Position;
     // fn get_snapshot_history(&self) -> Vec<Map>;

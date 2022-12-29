@@ -1,16 +1,16 @@
 use bevy::prelude::*;
 
-// use rand::prelude::*;
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 
 use super::{
     common::{apply_room_to_map, draw_corridor},
-    Map, MapBuilder,
+    MapBuilder,
 };
-use crate::components::map::{MapTileType, Position};
+use crate::components::map::Position;
 use crate::geometry::Rect;
-// use crate::{components::map::TileType, SCREEN_HEIGHT, SCREEN_WIDTH, TILESIZE};
+use crate::spawner::spawn_room;
+use crate::systems::map::{Map, MapTileType};
 
 pub struct BspDungeonBuilder {
     map: Map,
@@ -34,18 +34,17 @@ impl MapBuilder for BspDungeonBuilder {
         self.build();
     }
 
-    fn spawn_entities(&mut self, ecs: &mut World) {}
-
-    // fn spawn_entities(&mut self, ecs : &mut World) {
-    //     for room in self.rooms.iter().skip(1) {
-    //         spawner::spawn_room(ecs, room, self.depth);
-    //     }
-    // }
+    // Don't spawn anything in the first room (room with Player in it)
+    fn spawn_entities(&mut self, commands: &mut Commands) {
+        for room in self.rooms.iter().skip(1) {
+            spawn_room(commands, room, &self.map, self.depth);
+        }
+    }
 }
 
 impl BspDungeonBuilder {
     pub fn new(new_depth: i32) -> Self {
-        println!("New BspDungeonBuilder created (map needs to be built)");
+        // println!("New BspDungeonBuilder created (map needs to be built)");
         BspDungeonBuilder {
             // TODO: Decouple map size from screen dimensions
             map: Map::new(40, 24),
@@ -113,7 +112,7 @@ impl BspDungeonBuilder {
 
         // Don't forget the stairs
         let stairs = self.rooms[self.rooms.len() - 1].center();
-        let stairs_idx = self.map.xy_idx(stairs.0 as u32, stairs.1 as u32);
+        let stairs_idx = self.map.xy_idx(stairs.0, stairs.1);
         self.map.tiles[stairs_idx as usize] = MapTileType::DownStairs;
         // self.take_snapshot();
 
@@ -124,7 +123,7 @@ impl BspDungeonBuilder {
             y: start.1,
         };
 
-        println!("BspDungeonBuilder has built a dungeon");
+        // println!("BspDungeonBuilder has built a dungeon");
     }
 
     fn add_subrects(&mut self, rect: Rect) {
@@ -204,7 +203,7 @@ impl BspDungeonBuilder {
                     can_build = false;
                 }
                 if can_build {
-                    let idx = self.map.xy_idx(x as u32, y as u32);
+                    let idx = self.map.xy_idx(x, y);
                     if self.map.tiles[idx as usize] != MapTileType::Wall {
                         can_build = false;
                     }

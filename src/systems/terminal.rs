@@ -4,7 +4,8 @@ use crate::components::map::Position;
 use crate::components::rendering::{
     BottomSidebar, Renderable, RightSidebar, TerminalTile, TopSidebar,
 };
-use crate::systems::map::Map;
+use crate::systems::map::{wall_glyph, Map, MapTileType};
+use crate::text::char_to_cp437;
 use crate::text::{default_textstyle, DefaultTextStyle};
 
 // Layer order for different entities. Tiles at the back, text at the front
@@ -146,7 +147,7 @@ pub fn init_terminal(
     // Note that this system does not actually create the terminal resource,
     // that is done in the main app.
 
-    println!("Initializing the terminal");
+    // println!("Initializing the terminal");
 
     // println!("{}", terminal.get_screen_dim().0);
 
@@ -287,7 +288,7 @@ pub fn render_terminal(
     // mut commands: Commands,
     map: Res<Map>,
     mut terminal: ResMut<Terminal>,
-    mut r_query: Query<(&Renderable, &Position), With<Renderable>>,
+    r_query: Query<(&Renderable, &Position), With<Renderable>>,
     // QuerySet limited to 4 QueryState
     mut q: QuerySet<(
         QueryState<(&mut Transform, &mut TextureAtlasSprite, &TerminalTile), With<TerminalTile>>,
@@ -332,22 +333,46 @@ pub fn render_terminal(
 
             // Convert map_idx to terminal_idx
             let terminal_idx = terminal.xy_idx(term_x_idx, term_y_idx);
-            terminal.terminal_tiles[terminal_idx].0 = Map::maptiletype_to_spriteidx(map_tile);
-            // TODO: Change map tile color based on environment
+
+            // Determine the correct glyph to show for the tile
             // Default map tile color is blue
-            terminal.terminal_tiles[terminal_idx].1 = Color::BLUE;
+            match map_tile {
+                // TODO: Change map tile color based on environment
+                // Wall tiles change based on their neighbors
+                MapTileType::Wall => {
+                    terminal.terminal_tiles[terminal_idx].0 =
+                        wall_glyph(&map, map_x_idx as i32, map_y_idx as i32) as usize;
+                    terminal.terminal_tiles[terminal_idx].1 = Color::BLUE;
+                }
+                MapTileType::Floor => {
+                    terminal.terminal_tiles[terminal_idx].0 = char_to_cp437('.');
+                    terminal.terminal_tiles[terminal_idx].1 = Color::BLUE;
+                }
+                MapTileType::DownStairs => {
+                    terminal.terminal_tiles[terminal_idx].0 = char_to_cp437('↓');
+                    terminal.terminal_tiles[terminal_idx].1 = Color::GREEN;
+                }
+                MapTileType::UpStairs => {
+                    terminal.terminal_tiles[terminal_idx].0 = char_to_cp437('↑');
+                    terminal.terminal_tiles[terminal_idx].1 = Color::GREEN;
+                }
+            }
         }
     }
 
     // Update the tiles that draw Renderable entities. Note that this replaces
     // what was drawn by the map.
-    for (renderable, position) in r_query.iter() {
+    // Sort Renderable entities by their render_order. The lower the render_order,
+    // the higher the priority. Thus, Player should have priority 0.
+    let mut data = r_query.iter().collect::<Vec<_>>();
+    data.sort_by(|&a, &b| b.0.render_order.cmp(&a.0.render_order));
+    for (renderable, position) in data.iter() {
         // println!("Found a renderable!");
 
         let (term_x_idx, term_y_idx) =
             terminal.map_coord_to_term_coord(position.x as u32, position.y as u32);
         let terminal_idx = terminal.xy_idx(term_x_idx, term_y_idx);
-        terminal.terminal_tiles[terminal_idx].0 = char_to_spriteidx(renderable.glyph);
+        terminal.terminal_tiles[terminal_idx].0 = char_to_cp437(renderable.glyph);
         terminal.terminal_tiles[terminal_idx].1 = renderable.fg;
     }
 
@@ -357,12 +382,5 @@ pub fn render_terminal(
         let (_, mut sprite, tile_component) = tile;
         sprite.index = terminal.terminal_tiles[tile_component.idx].0;
         sprite.color = terminal.terminal_tiles[tile_component.idx].1;
-    }
-}
-
-pub fn char_to_spriteidx(glyph: char) -> usize {
-    match glyph {
-        '@' => 64,
-        _ => panic!("Spriteindex not defined for this char: {}", glyph),
     }
 }

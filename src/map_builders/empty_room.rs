@@ -1,17 +1,14 @@
 use bevy::prelude::*;
 
-use super::{
-    common::{apply_room_to_map, draw_corridor},
-    Map, MapBuilder,
-};
-use crate::components::map::{MapTileType, Position};
+use super::{common::apply_room_to_map, Map, MapBuilder};
+use crate::components::map::Position;
 use crate::geometry::Rect;
+use crate::spawner::goblin;
 
 pub struct EmptyRoomBuilder {
     map: Map,
     starting_position: Position,
     depth: i32,
-    rooms: Vec<Rect>,
     // history: Vec<Map>,
     rects: Vec<Rect>,
 }
@@ -29,24 +26,19 @@ impl MapBuilder for EmptyRoomBuilder {
         self.build();
     }
 
-    fn spawn_entities(&mut self, ecs: &mut World) {}
-
-    // fn spawn_entities(&mut self, ecs : &mut World) {
-    //     for room in self.rooms.iter().skip(1) {
-    //         spawner::spawn_room(ecs, room, self.depth);
-    //     }
-    // }
+    fn spawn_entities(&mut self, commands: &mut Commands) {
+        goblin(commands, 10, 20);
+    }
 }
 
 impl EmptyRoomBuilder {
-    pub fn new(new_depth: i32) -> Self {
+    pub fn new(_: i32) -> Self {
         println!("New EmptyRoomBuilder created (map needs to be built)");
         EmptyRoomBuilder {
             // TODO: Decouple map size from screen dimensions
             map: Map::new(40, 24),
             starting_position: Position { x: 0, y: 0 },
-            depth: new_depth,
-            rooms: Vec::new(),
+            depth: 1,
             // history: Vec::new(),
             rects: Vec::new(),
         }
@@ -67,5 +59,8 @@ impl EmptyRoomBuilder {
         //     // "x1: {}, x2: {}, y1: {}, y2: {}",
         //     first_room.x1, first_room.x2, first_room.y1, first_room.y2
         // );
+
+        let (x, y) = first_room.center();
+        self.starting_position = Position { x, y }
     }
 }

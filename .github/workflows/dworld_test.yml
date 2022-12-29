@@ -4,7 +4,7 @@ name: Test DWorld
 
 on:
   push:
-    branches: [ master, basic_monsters ]
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 

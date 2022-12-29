@@ -53,6 +53,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: dtolnay/rust-toolchain@stable
+    - name: Install alsa and libudev
+      run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
+      if: runner.os == 'linux'
     - name: Build release
       run: cargo build --release
     - name: Upload binaries to release

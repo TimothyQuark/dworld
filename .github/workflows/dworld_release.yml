@@ -4,7 +4,7 @@ name: Release
 
 on:
   push:
-    branches: [ master, basic_monsters]
+    branches: [ master ]
 
 env:
   CARGO_TERM_COLOR: always

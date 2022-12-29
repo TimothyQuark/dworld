@@ -31,20 +31,24 @@ jobs:
           # TODO: This might be fixed by running nightly toolchain instead of
           # stable for MacOS, see https://github.com/bevyengine/bevy/blob/main/.github/workflows/ci.yml
           # for possible way to implement
-          # - os: macos-latest
-          #   artifact_name: dworld_rust
-          #   asset_name: dworld-macos
+          - os: macos-latest
+            artifact_name: dworld_rust
+            asset_name: dworld-macos
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions-rs/toolchain@v1
+    - uses: actions/checkout@v3
+    - uses: dtolnay/rust-toolchain@stable
       with:
         toolchain: stable
         override: true
     - name: Install alsa and udev
       run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
       if: runner.os == 'linux'
+    # - name: Add iOS targets
+    #   run: rustup target add aarch64-apple-ios x86_64-apple-ios
+    #   if: runner.os == 'macos'
     - name: Build
       run: cargo build --verbose
     - name: Test
       run: cargo test --verbose
+
